@@ -1,0 +1,20 @@
+/* walls */
+.wall {
+  border: 1px solid red;
+}
+.top.left {
+  border: 1px solid red;
+}
+.top.right {
+  border: 1px solid red;
+}
+.bottom.left {
+  border: 1px solid red;
+}
+.bottom.right {
+  border: 1px solid red;
+}
+
+/* pacman */
+
+/* ghosts */
