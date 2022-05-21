@@ -1,3 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@media (orientation: landscape) {
+  :root {
+    --point: 1vh;
+  }
+}
+@media (orientation: portrait) {
+  :root {
+    --point: 1vw;
+  }
+}
+
+body {
+  font-family: 'Press Start 2P';
+}
+
 /* walls */
 .wall {
   border: 1px solid red;
