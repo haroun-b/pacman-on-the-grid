@@ -1,13 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
-* {
-  border: 1px solid blue; /* !temp */
-}
-
 /* ======================================= */
 /* global */
 
 body {
+  background-color: #000;
+  color: #fff;
   font-family: "Press Start 2P";
   font-size: 0.65rem;
   width: 100vw;
@@ -62,8 +60,18 @@ main {
 }
 
 /* walls */
-.wall.cell {
+.wall {
   background-color: #1c1c78;
+}
+
+/* pellet */
+.pellet {
+  background-color: #fff;
+}
+
+/* power-up */
+.power-up {
+  background-color: #ffbfa4;
 }
 
 /* pacman */

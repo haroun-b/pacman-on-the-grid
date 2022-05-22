@@ -106,14 +106,22 @@ const game = {
 
   },
   renderAll() {
-
-  },
-  renderWalls() {
     for (let i = 0; i < this.phMatrix.length; i++) {
       if (!this.phMatrix[i]) {
         this.phCells[i].classList.add(`wall`);
       }
+
+      if (this.phMatrix[i] === 3) {
+        this.phCells[i].classList.add(`power-up`);
+      }
+
+      if (this.phMatrix[i] === 2) {
+        this.phCells[i].classList.add(`pellet`);
+      }
     }
+  },
+  renderWalls() {
+    
   },
   buildCells() {
     this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
@@ -128,8 +136,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell`;
 
-      phCell.textContent = i.toString();
-      spCell.textContent = i.toString();
+      // phCell.textContent = i.toString();
+      // spCell.textContent = i.toString();
 
       this.phCells.push(phCell);
       this.phContainer.appendChild(phCell);
@@ -140,7 +148,7 @@ const game = {
 }
 
 game.buildCells();
-game.renderWalls();
+game.renderAll();
 
 window.addEventListener(`keydown`, e => {
   const main = document.querySelector(`main`),
