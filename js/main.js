@@ -134,10 +134,11 @@ const game = {
       const spCell = document.createElement(`div`);
 
       phCell.className = `cell`;
-      spCell.className = `cell`;
+      spCell.className = `cell ghost`;
 
       // phCell.textContent = i.toString();
       // spCell.textContent = i.toString();
+
 
       this.phCells.push(phCell);
       this.phContainer.appendChild(phCell);
