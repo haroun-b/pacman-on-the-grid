@@ -79,9 +79,15 @@ const game = {
   hasStarted: false,
   highScore: 0,
   pelletsLeft: 0,
-  grid: playground.flat(),
-  gridElement: document.getElementById(`playground`),
-  cellElements: [],
+  width: playground[0].length,
+  height: playground.length,
+  phMatrix: playground.flat(),
+  phContainer: document.querySelector(`.physical.plane`),
+  phCells: [],
+  spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1),
+  spContainer: document.querySelector(`.spirits.plane`),
+  spCells: [],
+  
 
   refresh() {
 
@@ -102,15 +108,24 @@ const game = {
 
   },
   buildCells() {
-    for (let i = 0; i < this.grid.length; i++) {
-      console.log(i);
-      const cell = document.createElement(`div`);
-      cell.className = `cell`;
+    this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
+    this.spContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
 
-      this.cellElements.push(cell);
-      this.gridElement.appendChild(cell);
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      const phCell = document.createElement(`div`);
+      const spCell = document.createElement(`div`);
+
+      phCell.className = `cell`;
+      spCell.className = `cell`;
+
+      this.phCells.push(phCell);
+      this.phContainer.appendChild(phCell);
+      this.spCells.push(spCell);
+      this.spContainer.appendChild(spCell);
     }
   }
 }
-console.log(game.grid.length);
+
+
 game.buildCells();
+console.log(game.width, game.height);
