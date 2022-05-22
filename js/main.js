@@ -26,12 +26,6 @@ class Player {
   canMove() {
 
   }
-  show() {
-
-  }
-  hide() {
-
-  }
 }
 
 class PacMan extends Player {
@@ -42,8 +36,8 @@ class PacMan extends Player {
 }
 
 class Ghost extends Player {
-  constructor(name, position, direction) {
-    super(name, position, direction, reward);
+  constructor(name, position, direction, reward) {
+    super(name, position, direction);
     this.isEatable = false;
     this.isEaten = false;
     this.isHome = true;
@@ -68,12 +62,6 @@ class Ghost extends Player {
   respawn() {
 
   }
-  show() {
-
-  }
-  hide() {
-
-  }
 }
 
 const ghostHome = {
@@ -92,6 +80,8 @@ const game = {
   highScore: 0,
   pelletsLeft: 0,
   grid: playground.flat(),
+  gridElement: document.getElementById(`playground`),
+  cellElements: [],
 
   refresh() {
 
@@ -111,7 +101,16 @@ const game = {
   renderAll() {
 
   },
-  renderWalls() {
+  buildCells() {
+    for (let i = 0; i < this.grid.length; i++) {
+      console.log(i);
+      const cell = document.createElement(`div`);
+      cell.className = `cell`;
 
-  },
+      this.cellElements.push(cell);
+      this.gridElement.appendChild(cell);
+    }
+  }
 }
+console.log(game.grid.length);
+game.buildCells();

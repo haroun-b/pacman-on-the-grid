@@ -2,17 +2,24 @@
 
 @media (orientation: landscape) {
   :root {
-    --point: 1vh;
+    --percent: 1vh;
   }
 }
 @media (orientation: portrait) {
   :root {
-    --point: 1vw;
+    --percent: 1vw;
   }
 }
 
+
+
 body {
   font-family: 'Press Start 2P';
+}
+
+.cell {
+  border: 1px solid red;
+  height: 20px;
 }
 
 /* walls */
