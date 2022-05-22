@@ -26,6 +26,7 @@ main {
   justify-content: center;
   margin: 0 14rem auto;
 }
+/* ======================================= */
 
 /* ======================================= */
 /* stats */
@@ -61,21 +62,9 @@ main {
 }
 
 /* walls */
-/* .wall {
-  border: 1px solid red;
+.wall.cell {
+  background-color: #1c1c78;
 }
-.top.left {
-  border: 1px solid red;
-}
-.top.right {
-  border: 1px solid red;
-}
-.bottom.left {
-  border: 1px solid red;
-}
-.bottom.right {
-  border: 1px solid red;
-} */
 
 /* pacman */
 

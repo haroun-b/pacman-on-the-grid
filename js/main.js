@@ -79,8 +79,8 @@ const game = {
   hasStarted: false,
   highScore: 0,
   pelletsLeft: 0,
-  width: playground[0].length,
-  height: playground.length,
+  width: playground.length,
+  height: playground[0].length,
   playgroundElement: document.getElementById(`playground`),
   phMatrix: playground.flat(),
   phContainer: document.querySelector(`.physical.plane`),
@@ -108,9 +108,18 @@ const game = {
   renderAll() {
 
   },
+  renderWalls() {
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      if (!this.phMatrix[i]) {
+        this.phCells[i].classList.add(`wall`);
+      }
+    }
+  },
   buildCells() {
     this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
     this.spContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
+
+    console.log(this.width, this.height);
 
     for (let i = 0; i < this.phMatrix.length; i++) {
       const phCell = document.createElement(`div`);
@@ -118,6 +127,9 @@ const game = {
 
       phCell.className = `cell`;
       spCell.className = `cell`;
+
+      phCell.textContent = i.toString();
+      spCell.textContent = i.toString();
 
       this.phCells.push(phCell);
       this.phContainer.appendChild(phCell);
@@ -127,9 +139,8 @@ const game = {
   }
 }
 
-
 game.buildCells();
-console.log(game.width, game.height);
+game.renderWalls();
 
 window.addEventListener(`keydown`, e => {
   const main = document.querySelector(`main`),
