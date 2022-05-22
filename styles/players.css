@@ -1,0 +1,344 @@
+/* ======================================= */
+/* pacman */
+
+/* pacman alive */
+.pacman {
+  animation: pacman 0.2s linear infinite alternate;
+}
+
+@keyframes pacman {
+  0% {
+    background-image: url("/resources/sprites/pacman/pacman-1.svg");
+  }
+  50% {
+    background-image: url("/resources/sprites/pacman/pacman-2.svg");
+  }
+  100% {
+    background-image: url("/resources/sprites/pacman/pacman-3.svg");
+  }
+}
+
+/* ======================================= */
+/* dying pacman */
+.d-pacman {
+  animation: d-pacman 1s linear 1;
+}
+
+@keyframes d-pacman {
+  0% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-1.svg");
+  }
+  5% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-2.svg");
+  }
+  15% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-3.svg");
+  }
+  25% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-4.svg");
+  }
+  35% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-5.svg");
+  }
+  45% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-6.svg");
+  }
+  55% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-7.svg");
+  }
+  65% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-8.svg");
+  }
+  75% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-9.svg");
+  }
+  85% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-10.svg");
+  }
+  95% {
+    background-image: url("/resources/sprites/pacman/dying/d-pacman-11.svg");
+  }
+}
+
+/* ======================================= */
+
+/* ======================================= */
+/* ghosts */
+
+.ghost {
+  animation: 0.18s linear infinite alternate;
+}
+
+/* ======================================= */
+/* blinky */
+
+/* up */
+.blinky.up {
+  animation-name: blinky-up;
+}
+
+@keyframes blinky-up {
+  from {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-up-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-up-2.svg");
+  }
+}
+
+/* down */
+.blinky.down {
+  animation-name: blinky-down;
+}
+
+@keyframes blinky-down {
+  from {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-down-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-down-2.svg");
+  }
+}
+
+/* left */
+.blinky.left {
+  animation-name: blinky-left;
+}
+
+@keyframes blinky-left {
+  from {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-left-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-left-2.svg");
+  }
+}
+
+/* right */
+.blinky.right {
+  animation-name: blinky-right;
+}
+
+@keyframes blinky-right {
+  from {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-right-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/blinky/blinky-right-2.svg");
+  }
+}
+
+/* ======================================= */
+/* inky */
+
+/* up */
+.inky.up {
+  animation-name: inky-up;
+}
+
+@keyframes inky-up {
+  from {
+    background-image: url("/resources/sprites/ghosts/inky/inky-up-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/inky/inky-up-2.svg");
+  }
+}
+
+/* down */
+.inky.down {
+  animation-name: inky-down;
+}
+
+@keyframes inky-down {
+  from {
+    background-image: url("/resources/sprites/ghosts/inky/inky-down-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/inky/inky-down-2.svg");
+  }
+}
+
+/* left */
+.inky.left {
+  animation-name: inky-left;
+}
+
+@keyframes inky-left {
+  from {
+    background-image: url("/resources/sprites/ghosts/inky/inky-left-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/inky/inky-left-2.svg");
+  }
+}
+
+/* right */
+.inky.right {
+  animation-name: inky-right;
+}
+
+@keyframes inky-right {
+  from {
+    background-image: url("/resources/sprites/ghosts/inky/inky-right-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/inky/inky-right-2.svg");
+  }
+}
+
+/* ======================================= */
+/* pinky */
+
+/* up */
+.pinky.up {
+  animation-name: pinky-up;
+}
+
+@keyframes pinky-up {
+  from {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-up-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-up-2.svg");
+  }
+}
+
+/* down */
+.pinky.down {
+  animation-name: pinky-down;
+}
+
+@keyframes pinky-down {
+  from {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-down-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-down-2.svg");
+  }
+}
+
+/* left */
+.pinky.left {
+  animation-name: pinky-left;
+}
+
+@keyframes pinky-left {
+  from {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-left-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-left-2.svg");
+  }
+}
+
+/* right */
+.pinky.right {
+  animation-name: pinky-right;
+}
+
+@keyframes pinky-right {
+  from {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-right-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/pinky/pinky-right-2.svg");
+  }
+}
+
+/* ======================================= */
+/* clyde */
+
+/* up */
+.clyde.up {
+  animation-name: clyde-up;
+}
+
+@keyframes clyde-up {
+  from {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-up-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-up-2.svg");
+  }
+}
+
+/* down */
+.clyde.down {
+  animation-name: clyde-down;
+}
+
+@keyframes clyde-down {
+  from {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-down-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-down-2.svg");
+  }
+}
+
+/* left */
+.clyde.left {
+  animation-name: clyde-left;
+}
+
+@keyframes clyde-left {
+  from {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-left-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-left-2.svg");
+  }
+}
+
+/* right */
+.clyde.right {
+  animation-name: clyde-right;
+}
+
+@keyframes clyde-right {
+  from {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-right-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/clyde/clyde-right-2.svg");
+  }
+}
+
+/* ======================================= */
+/* eatable ghost */
+.eatable.ghost {
+  animation-name: eatable-ghost;
+}
+
+@keyframes eatable-ghost {
+  from {
+    background-image: url("/resources/sprites/ghosts/eatable-ghost-1.svg");
+  }
+  to {
+    background-image: url("/resources/sprites/ghosts/eatable-ghost-2.svg");
+  }
+}
+
+/* ======================================= */
+/* eaten ghost */
+
+/* up */
+.eaten.ghost.up {
+  background-image: url(/resources/sprites/ghosts/eaten-ghost-up.svg);
+}
+
+/* down */
+.eaten.ghost.down {
+  background-image: url(/resources/sprites/ghosts/eaten-ghost-down.svg);
+}
+
+/* left */
+.eaten.ghost.left {
+  background-image: url(/resources/sprites/ghosts/eaten-ghost-left.svg);
+}
+
+/* right */
+.eaten.ghost.right {
+  background-image: url(/resources/sprites/ghosts/eaten-ghost-right.svg);
+}

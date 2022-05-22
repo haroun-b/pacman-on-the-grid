@@ -55,8 +55,10 @@ main {
   gap: 0;
 }
 
+/* cell */
 .cell {
-  border: 1px solid red;
+  background-repeat: no-repeat;
+  background-size: 100%;
 }
 
 /* walls */
@@ -66,17 +68,23 @@ main {
 
 /* pellet */
 .pellet {
-  background-color: #fff;
+  background-image: url("/resources/sprites/pellet.svg");
 }
 
 /* power-up */
 .power-up {
-  background-color: #ffbfa4;
+  background-image: url("/resources/sprites/power-up.svg");
+  animation: power-up 1s linear infinite alternate;
 }
 
-/* pacman */
-
-/* ghosts */
+@keyframes power-up {
+  from {
+    opacity: 100%;
+  }
+  to {
+    opacity: 40%;
+  }
+}
 /* ======================================= */
 
 /* ======================================= */
