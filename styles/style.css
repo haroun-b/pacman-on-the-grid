@@ -1,68 +1,58 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
-:root {
-  --percent: 1vh; /* ?temp */
-}
-
-/* ======================================= */
-/* media queries */
-
-/* landscape mode */
-@media (orientation: landscape) {
-  body {
-    flex-flow: row-reverse nowrap;
-  }
-}
-
-/* portrait mode */
-@media (orientation: portrait) {
-  :root {
-    --percent: 1vw; /* ?temp */
-  }
-
-  body {
-    flex-flow: column nowrap;
-  }
-}
-/* ======================================= */
-
 * {
   border: 1px solid blue; /* !temp */
 }
 
+/* ======================================= */
+/* global */
+
 body {
   font-family: "Press Start 2P";
-}
-
-body {
-  display: flex;
+  font-size: 0.65rem;
   width: 100vw;
-  height: 100vh;
-  justify-content: space-between;
-  align-items: center;
 }
-/* ======================================= */
 
+body,
+main {
+  height: 100vh;
+}
 
+main {
+  display: flex;
+  flex-flow: column nowrap;
+  width: calc(100vh - 2.2rem);
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
 
 /* ======================================= */
 /* stats */
 
 #stats {
   display: flex;
-  flex-flow: column wrap;
-  font-size: calc(1 * var(--percent));
-  flex-shrink: 1;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.2rem;
+  width: 100%;
 }
-
 /* ======================================= */
 
 /* ======================================= */
 /* playground */
 
+#playground {
+  width: calc(100vh - 2.25rem);
+  height: calc(100vh - 2.25rem);
+}
+
 .plane {
   position: absolute;
   display: grid;
+  width: calc(100vh - 2.25rem);
+  height: calc(100vh - 2.25rem);
   gap: 0;
 }
 
@@ -97,7 +87,7 @@ body {
 
 #controls {
   flex-shrink: 1;
-  display: grid;
+  display: none;
   width: 100px;
   height: 100px;
   grid-template-rows: 1fr 0.75fr 1fr;
@@ -152,4 +142,36 @@ body {
   background-image: url("/resources/buttons/down.svg");
   background-position: 50% 75%;
 }
+/* ======================================= */
+
+/* ======================================= */
+/* media queries */
+
+/* portrait mode */
+@media (orientation: portrait) {
+  main {
+    width: 100vw;
+  }
+
+  #playground {
+    width: 100vw;
+    height: 100vw;
+  }
+
+  .plane {
+    width: 100vw;
+    height: 100vw;
+  }
+}
+
+@media (width < 950px) {
+  body {
+    font-size: .4rem;
+  }
+
+  #stats {
+  height: 1.4rem;
+}
+}
+
 /* ======================================= */

@@ -131,17 +131,17 @@ const game = {
 game.buildCells();
 console.log(game.width, game.height);
 
-visualViewport.addEventListener(`resize`, e => {
-  [game.playgroundElement, game.phContainer, game.spContainer].forEach(container => {
-    if (visualViewport.width < visualViewport.height) {
-      container.style.width = `100vw`;
-      container.style.height = `${(game.height / game.width) * 100}vw`;
+// visualViewport.addEventListener(`resize`, e => {
+//   [game.playgroundElement, game.phContainer, game.spContainer].forEach(container => {
+//     if (visualViewport.width < visualViewport.height) {
+//       container.style.width = `100vw`;
+//       container.style.height = `${(game.height / game.width) * 100}vw`;
 
       
-    }
-    if (visualViewport.width > visualViewport.height) {
-      container.style.height = `100vh`;
-      container.style.width = `${(game.width / game.height) * 100}vh`;
-    }
-  });
-});
+//     }
+//     if (visualViewport.width > visualViewport.height) {
+//       container.style.height = `100vh`;
+//       container.style.width = `${(game.width / game.height) * 100}vh`;
+//     }
+//   });
+// });
