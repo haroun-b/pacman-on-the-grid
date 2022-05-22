@@ -14,15 +14,19 @@ body {
     --percent: 1vw;
   }
 
-  body,
-  main {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-  }
 
+}
 
+body {
+  font-family: "Press Start 2P";
+}
+
+body,
+main {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
 }
 /* ======================================= */
 
@@ -43,47 +47,46 @@ body {
   gap: 0;
 }
 
-#controls button {
+.control {
   all: unset;
   position: relative;
   background-color: #ffbfa4;
   background-repeat: no-repeat;
 }
 
-#up,
-#down {
+.control.up, .control.down {
   background-size: 60%;
 }
 
-#up {
+.control.up {
   grid-area: u;
   top: 22%;
   clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
-  background-image: url("/resources/buttons/up.svg");
+  background-image: url('/resources/buttons/up.svg');
   background-position: 50% 25%;
 }
 
-#left {
+.control.left {
   grid-area: l;
   left: 22%;
   clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
-  background-image: url("/resources/buttons/left.svg");
+  background-image: url('/resources/buttons/left.svg');
   background-position: 40% 50%;
 }
 
-#right {
+.control.right {
   grid-area: r;
   right: 22%;
   clip-path: polygon(0 50%, 25% 0, 100% 0, 100% 100%, 25% 100%);
-  background-image: url("/resources/buttons/right.svg");
+  background-image: url('/resources/buttons/right.svg');
   background-position: 60% 50%;
 }
 
-#down {
+.control.down {
   grid-area: d;
   bottom: 22%;
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 0 100%);
-  background-image: url("/resources/buttons/down.svg");
+  background-image: url('/resources/buttons/down.svg');
   background-position: 50% 75%;
 }
 /* ======================================= */
