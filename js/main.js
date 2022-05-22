@@ -88,7 +88,7 @@ const game = {
   spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1),
   spContainer: document.querySelector(`.spirits.plane`),
   spCells: [],
-  
+
 
   refresh() {
 
@@ -131,17 +131,12 @@ const game = {
 game.buildCells();
 console.log(game.width, game.height);
 
-// visualViewport.addEventListener(`resize`, e => {
-//   [game.playgroundElement, game.phContainer, game.spContainer].forEach(container => {
-//     if (visualViewport.width < visualViewport.height) {
-//       container.style.width = `100vw`;
-//       container.style.height = `${(game.height / game.width) * 100}vw`;
+window.addEventListener(`keydown`, e => {
+  const main = document.querySelector(`main`),
+    controls = document.getElementById(`controls`);
 
-      
-//     }
-//     if (visualViewport.width > visualViewport.height) {
-//       container.style.height = `100vh`;
-//       container.style.width = `${(game.width / game.height) * 100}vh`;
-//     }
-//   });
-// });
+  main.style.justifyContent = `flex-start`;
+  main.style.margin = `0 auto`;
+
+  controls.style.display = `none`;
+}, { once: true });

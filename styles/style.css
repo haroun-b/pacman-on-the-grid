@@ -22,9 +22,9 @@ main {
   display: flex;
   flex-flow: column nowrap;
   width: calc(100vh - 2.2rem);
-  justify-content: flex-start;
   align-items: center;
-  margin: 0 auto;
+  justify-content: center;
+  margin: 0 14rem auto;
 }
 
 /* ======================================= */
@@ -97,6 +97,9 @@ main {
     "l . r"
     ". d .";
   gap: 0;
+  position: absolute;
+  left: 0;
+  margin: auto 0;
 }
 
 .control {
@@ -172,6 +175,8 @@ main {
 @media (orientation: portrait) {
   main {
     width: 100vw;
+    align-items: center;
+    margin: 0 auto;
   }
 
   #playground {
@@ -183,18 +188,11 @@ main {
     width: 100vw;
     height: 100vw;
   }
-}
-
-@media (orientation: landscape) {
-  main {
-    justify-content: center;
-    margin: 0 14rem auto;
-  }
 
   #controls {
-    position: absolute;
-    left: 0;
-    margin: auto 0;
+    position: unset;
+    left: unset;
+    margin: unset;
   }
 }
 
