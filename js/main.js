@@ -79,6 +79,7 @@ const ghostHome = {
 
 const game = {
   hasStarted: false,
+  isLost: true,
   highScore: 0,
   pelletsLeft: 0,
   width: playground.length,
@@ -93,8 +94,20 @@ const game = {
 
 
   refresh() {
+    pacman.move();
+    ghosts.forEach(ghost => { ghost.move() });  // TODO when pacman moves it updates the phMatrix; when the ghosts move they only set game.isLost to true when they catch pacman 
 
+    if (this.isLost) {
+      this.lose();
+    }
+    if(this.pelletsLeft === 0) {
+      this.win();
+    }
+
+    this.renderPh();
+    this.renderSp();
   },
+
   start() {
     this.renderWalls();
     this.renderPh();
@@ -110,20 +123,25 @@ const game = {
     }, 3000);
 
   },
+
   end() {
 
   },
+
   win() {
 
   },
+
   lose() {
 
   },
+
   renderSp() {
     ghosts.forEach(ghost => {
       this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses}`;
     });
   },
+
   renderPh() {
     for (let i = 0; i < this.phMatrix.length; i++) {
       switch (this.phMatrix[i]) {
@@ -142,6 +160,7 @@ const game = {
       }
     }
   },
+
   renderWalls() {
     for (let i = 0; i < this.phMatrix.length; i++) {
       if (this.phMatrix[i] === 0) {
@@ -149,6 +168,7 @@ const game = {
       }
     }
   },
+
   buildCells() {
     this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
     this.spContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
