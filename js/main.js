@@ -97,11 +97,12 @@ class PacMan extends Player {
 // ================================================ \\
 // the ghosts \\
 class Ghost extends Player {
-  constructor(name, position, direction, reward) {
+  constructor(name, position, direction, reward, home) {
     super(name, position, direction);
+    this.home = home;
+    this.isHome = true;
     this.isEatable = false;
     this.isEaten = false;
-    this.isHome = true;
     this.reward = reward;
   }
 
@@ -116,11 +117,27 @@ class Ghost extends Player {
   }
   move() {
     // TODO move is the only access point from game obj
+    // TODO move calls goHome() when isEaten === true
   }
   canMove() {
 
   }
-  respawn() {
+  leaveHome() {
+
+  }
+  goHome() {
+
+  }
+  getEaten() {
+    this.isEatable = false;
+    this.isEaten = true;
+
+    game.updateScore(this.reward);
+    this.goHome();
+  }
+
+  // TODO settimeout to toggle isEatable off
+  becomeEatable() {
 
   }
 }
@@ -171,7 +188,7 @@ const game = {
 
     this.countPills();
     // TODO check if ghost is eatable if so update score and sendHome else lose
-    const isLost = ghosts.some(ghost => ghost.position === pacman.position);
+    const isLost = ghosts.some(ghost => ghost.position === pacman.position);  // TODO replace with detectEncounter()
 
     if (isLost) {
       this.lose();
@@ -286,15 +303,34 @@ const game = {
     if (this.pillsLeft.pellets > newPelletCount) {
       this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
       this.pillsLeft.pellets = newPelletCount;
+      // TODO play appropriate sound
     }
     if (this.pillsLeft.powerUps > newPowerUpCount) {
       this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
       this.pillsLeft.powerUps = newPowerUpCount;
+
+      ghosts.forEach(ghost => { ghost.becomeEatable() });
+      // TODO play appropriate sound
     }
   },
   // TODO it takes points and adds them to the score updates the high score and displays them
+  // TODO it displays +reward next to the score when a ghost is eaten
   updateScore() {
 
+  },
+
+  detectEncounter() {
+    ghosts.forEach(ghost => {
+      if (ghost.position !== pacman.position) {
+        return;
+      }
+
+      if (!ghost.isEatable && !isEaten) {
+        this.lose();
+      } else {
+        ghost.getEaten();
+      }
+    });
   }
 }
 
