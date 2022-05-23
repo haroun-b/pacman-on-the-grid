@@ -28,6 +28,26 @@ class Player {
   getClasses() {
     return `${this.classes} ${this.direction}`;
   }
+  canMove() {
+    switch (this.direction) {
+      case `up`:
+        return game.phMatrix[this.position - game.width] !== 0;
+      case `down`:
+        return game.phMatrix[this.position + game.width] !== 0;
+      case `left`:
+        if (this.position % game.width === 0) {
+          return game.phMatrix[this.position + (game.width - 1)] !== 0;
+        } else {
+          return game.phMatrix[this.position - 1] !== 0;
+        }
+      case `right`:
+        if ((this.position + 1) % game.width === 0) {
+          return game.phMatrix[this.position - (game.width - 1)] !== 0;
+        } else {
+          return game.phMatrix[this.position + 1] !== 0;
+        }
+    }
+  }
 }
 
 // ================================================ \\
@@ -70,26 +90,6 @@ class PacMan extends Player {
       game.phMatrix[this.position] = 8;
     }
   }
-  canMove() {
-    switch (this.direction) {
-      case `up`:
-        return game.phMatrix[this.position - game.width] !== 0;
-      case `down`:
-        return game.phMatrix[this.position + game.width] !== 0;
-      case `left`:
-        if (this.position % game.width === 0) {
-          return game.phMatrix[this.position + (game.width - 1)] !== 0;
-        } else {
-          return game.phMatrix[this.position - 1] !== 0;
-        }
-      case `right`:
-        if ((this.position + 1) % game.width === 0) {
-          return game.phMatrix[this.position - (game.width - 1)] !== 0;
-        } else {
-          return game.phMatrix[this.position + 1] !== 0;
-        }
-    }
-  }
 }
 
 // ================================================ \\
@@ -106,39 +106,67 @@ class Ghost extends Player {
     this.reward = reward;
   }
 
-  hunt() {
+  hunt() {  //! ghost spesific
 
   }
-  withdraw() {
+
+  scatter() {  //! ghost spesific
 
   }
-  changeDirection() {
 
-  }
   move() {
     // TODO move is the only access point from game obj
+    // TODO move is only called at intersections
     // TODO move calls goHome() when isEaten === true
+    // TODO leave home if home
+    // TODO scatter when eatable
+    // TODO hunt otherwise
   }
-  canMove() {
 
+  atIntersection() {
+    let clearPaths = 0;
+
+    [`up`, `down`, `left`, `right`].forEach(dir => {
+      if (this.canMove(dir)) {
+        clearPaths++;
+      }
+    });
+
+    return clearPaths >= 3 ? true : false;
   }
+
   leaveHome() {
-
+    // TODO
   }
+
   goHome() {
+    // TODO
 
   }
+
   getEaten() {
     this.isEatable = false;
     this.isEaten = true;
 
     game.updateScore(this.reward);
-    this.goHome();
   }
 
-  // TODO settimeout to toggle isEatable off
-  becomeEatable() {
+  makeEatable() {
+    this.isEatable = true;
 
+    setTimeout(() => {
+      this.isEatable = false;
+    }, 7000);
+  }
+
+  getClasses() {
+    if (this.isEatable) {
+      return `eatable`;
+    } else if (this.isEaten) {
+      return `eaten ${this.direction}`;
+    } else {
+      return `${this.classes} ${this.direction}`;
+    }
   }
 }
 
@@ -234,7 +262,7 @@ const game = {
 
   renderSp() {
     ghosts.forEach(ghost => {
-      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses}`;
+      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
     });
   },
 
@@ -251,7 +279,7 @@ const game = {
           this.phCells[i].className = `cell power-up`;
           break;
         case 8:
-          this.phCells[i].className = `cell ${pacman.getClasses}`;
+          this.phCells[i].className = `cell ${pacman.getClasses()}`;
           break;
       }
     }
@@ -276,8 +304,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      phCell.textContent = i.toString();
-      spCell.textContent = i.toString();
+      // phCell.textContent = i.toString();
+      // spCell.textContent = i.toString();
 
 
       this.phCells.push(phCell);
@@ -309,7 +337,7 @@ const game = {
       this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
       this.pillsLeft.powerUps = newPowerUpCount;
 
-      ghosts.forEach(ghost => { ghost.becomeEatable() });
+      ghosts.forEach(ghost => { ghost.makeEatable() });
       // TODO play appropriate sound
     }
   },
