@@ -10,31 +10,49 @@ clyde: 7,
 pacMan: 8,
 */
 
+// ================================================ \\
+
+// ================================================ \\
+// player \\
 class Player {
-  constructor(name, position, direction) {
+  constructor(name, position, direction, classes) {
     this.name = name;
     this.position = position;
     this.direction = direction;
+    this.classes = classes;
   }
 
-  changeDirection() {
-
+  changeDirection(newDir) {
+    this.direction = newDir;
   }
+}
+
+// ================================================ \\
+
+// ================================================ \\
+// pacman \\
+class PacMan extends Player {
+  constructor(name = `Pac-Man`, position = 325, direction = `r`, classes = `pacman`) {
+    super(name, position, direction, classes);
+    this.score = 0;
+  }
+
+  // TODO move is the only access point from game obj
   move() {
 
   }
   canMove() {
 
   }
-}
+  getClasses() {
 
-class PacMan extends Player {
-  constructor(name = `Pac-Man`, position = 629, direction = `r`) {
-    super(name, position, direction);
-    this.score = 0;
   }
 }
 
+// ================================================ \\
+
+// ================================================ \\
+// the ghosts \\
 class Ghost extends Player {
   constructor(name, position, direction, reward) {
     super(name, position, direction);
@@ -54,7 +72,7 @@ class Ghost extends Player {
 
   }
   move() {
-
+    // TODO move is the only access point from game obj
   }
   canMove() {
 
@@ -64,7 +82,6 @@ class Ghost extends Player {
   }
 }
 
-const ghosts = [];
 
 const ghostHome = {
   isClosed: true,
@@ -76,12 +93,24 @@ const ghostHome = {
 
   }
 }
+// TODO uncomment
+// const ghosts = [
+//   new Blinky(),
+//   new Pinky(),
+//   new Inky(),
+//   new Clyde()
+// ];
+
+// ================================================ \\
+
+// ================================================ \\
+// the game \\
 
 const game = {
-  hasStarted: false,
+  hasStarted: false,  // !might go unused
   isLost: true,
   highScore: 0,
-  pelletsLeft: 0,
+  pillsLeft: 0, // pills includes both the pellets and powerUps
   width: playground.length,
   height: playground[0].length,
   playgroundElement: document.getElementById(`playground`),
@@ -100,7 +129,7 @@ const game = {
     if (this.isLost) {
       this.lose();
     }
-    if(this.pelletsLeft === 0) {
+    if (this.pillsLeft === 0) {
       this.win();
     }
 
@@ -109,6 +138,7 @@ const game = {
   },
 
   start() {
+    this.countPills();
     this.renderWalls();
     this.renderPh();
     this.renderSp();
@@ -125,15 +155,15 @@ const game = {
   },
 
   end() {
-
+    // TODO
   },
 
   win() {
-
+    // TODO
   },
 
   lose() {
-
+    // TODO
   },
 
   renderSp() {
@@ -181,7 +211,7 @@ const game = {
       spCell.className = `cell ghost`;
 
       // phCell.textContent = i.toString();
-      spCell.textContent = i.toString();
+      // spCell.textContent = i.toString();
 
 
       this.phCells.push(phCell);
@@ -189,14 +219,24 @@ const game = {
       this.spCells.push(spCell);
       this.spContainer.appendChild(spCell);
     }
+  },
+
+  countPills() {
+    let totalPills = 0;
+
+    this.phMatrix.forEach(cell => {
+      if (cell === 2 || cell === 3) {
+        totalPills++;
+      }
+    });
+
+    this.pillsLeft = totalPills;
   }
 }
 
-game.buildCells();
-game.renderWalls();
-game.renderPh();
 
 
+// ================================================ \\
 
 // ================================================ \\
 // event listeners \\
@@ -212,20 +252,25 @@ document.addEventListener(`keydown`, e => {
   controls.style.display = `none`;
 }, { once: true });
 
+// starts the game \\
+document.getElementById(`start-game`).addEventListener(`click`, e => {
+  game.start();
+});
+
 // changes pacman's direction based on keyboard input \\
 document.addEventListener(`keydown`, e => {
   switch (e.code) {
     case `ArrowUp`:
-
+      pacman.changeDirection(`u`);
       break;
     case `ArrowDown`:
-
+      pacman.changeDirection(`d`);
       break;
     case `ArrowLeft`:
-
+      pacman.changeDirection(`l`);
       break;
     case `ArrowRight`:
-
+      pacman.changeDirection(`r`);
       break;
   }
 });
@@ -236,16 +281,25 @@ document.getElementById(`controls`).addEventListener(`click`, e => {
 
   switch (targetClass) {
     case `control up`:
-
+      pacman.changeDirection(`u`);
       break;
     case `control down`:
-
+      pacman.changeDirection(`d`);
       break;
     case `control left`:
-
+      pacman.changeDirection(`l`);
       break;
     case `control right`:
-
+      pacman.changeDirection(`r`);
       break;
   }
 });
+
+// ================================================ \\
+
+// ================================================ \\
+// testing zone \\
+
+game.buildCells();
+game.renderWalls();
+game.renderPh();
