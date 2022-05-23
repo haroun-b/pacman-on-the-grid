@@ -37,27 +37,57 @@ class Player {
 class PacMan extends Player {
   constructor(name = `Pac-Man`, position = 325, direction = `right`, classes = `pacman`) {
     super(name, position, direction, classes);
-    this.score = 0;
   }
 
-  // TODO move is the only access point from game obj
+  // * move is the only access point from game obj
   move() {
+    if (this.canMove()) {
+      game.phMatrix[this.position] = 1;
 
+      switch (this.direction) {
+        case `up`:
+          this.position -= game.width;
+          break;
+        case `down`:
+          this.position + game.width;
+          break;
+        case `left`:
+          if (this.position % game.width === 0) {
+            this.position += (game.width - 1);
+          } else {
+            this.position--;
+          }
+          break;
+        case `right`:
+          if ((this.position + 1) % game.width === 0) {
+            this.position -= (game.width - 1);
+          } else {
+            this.position++;
+          }
+          break;
+      }
+
+      game.phMatrix[this.position] = 8;
+    }
   }
   canMove() {
     switch (this.direction) {
       case `up`:
-        return game.phMatrix[this.position - game.width]
-        break;
+        return game.phMatrix[this.position - game.width] !== 0;
       case `down`:
-        pacman.changeDirection(`down`);
-        break;
+        return game.phMatrix[this.position + game.width] !== 0;
       case `left`:
-        pacman.changeDirection(`left`);
-        break;
+        if (this.position % game.width === 0) {
+          return game.phMatrix[this.position + (game.width - 1)] !== 0;
+        } else {
+          return game.phMatrix[this.position - 1] !== 0;
+        }
       case `right`:
-        pacman.changeDirection(`right`);
-        break;
+        if ((this.position + 1) % game.width === 0) {
+          return game.phMatrix[this.position - (game.width - 1)] !== 0;
+        } else {
+          return game.phMatrix[this.position + 1] !== 0;
+        }
     }
   }
 }
@@ -121,9 +151,9 @@ const ghostHome = {
 
 const game = {
   hasStarted: false,  // !might go unused
-  isLost: true,
   highScore: 0,
-  pillsLeft: 0, // pills includes both the pellets and powerUps
+  score: 0,
+  pillsLeft: { pellets: 0, powerUps: 0 },
   width: playground[0].length,
   height: playground.length,
   playgroundElement: document.getElementById(`playground`),
@@ -137,21 +167,25 @@ const game = {
 
   refresh() {
     pacman.move();
-    ghosts.forEach(ghost => { ghost.move() });  // TODO when pacman moves it updates the phMatrix; when the ghosts move they only set game.isLost to true when they catch pacman 
+    ghosts.forEach(ghost => { ghost.move() });
 
-    if (this.isLost) {
+    this.countPills();
+    // TODO check if ghost is eatable if so update score and sendHome else lose
+    const isLost = ghosts.some(ghost => ghost.position === pacman.position);
+
+    if (isLost) {
       this.lose();
     }
-    if (this.pillsLeft === 0) {
+    if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
       this.win();
     }
 
     this.renderPh();
     this.renderSp();
+    this.updateScore(); //TODO
   },
 
   start() {
-    this.countPills();
     this.renderWalls();
     this.renderPh();
     this.renderSp();
@@ -162,6 +196,8 @@ const game = {
       setInterval(() => {
         game.refresh();
       }, 20);
+
+      listenForInput();
 
     }, 3000);
 
@@ -235,15 +271,30 @@ const game = {
   },
 
   countPills() {
-    let totalPills = 0;
+    let newPelletCount = 0,
+      newPowerUpCount = 0;
 
     this.phMatrix.forEach(cell => {
-      if (cell === 2 || cell === 3) {
-        totalPills++;
+      if (cell === 2) {
+        newPelletCount++;
+      }
+      if (cell === 3) {
+        newPowerUpCount++;
       }
     });
 
-    this.pillsLeft = totalPills;
+    if (this.pillsLeft.pellets > newPelletCount) {
+      this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
+      this.pillsLeft.pellets = newPelletCount;
+    }
+    if (this.pillsLeft.powerUps > newPowerUpCount) {
+      this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
+      this.pillsLeft.powerUps = newPowerUpCount;
+    }
+  },
+  // TODO it takes points and adds them to the score updates the high score and displays them
+  updateScore() {
+
   }
 }
 
@@ -265,48 +316,53 @@ document.addEventListener(`keydown`, e => {
   controls.style.display = `none`;
 }, { once: true });
 
+// ================================================ \\
 // starts the game \\
 document.getElementById(`start-game`).addEventListener(`click`, e => {
   game.start();
 });
 
-// changes pacman's direction based on keyboard input \\
-document.addEventListener(`keydown`, e => {
-  switch (e.code) {
-    case `ArrowUp`:
-      pacman.changeDirection(`up`);
-      break;
-    case `ArrowDown`:
-      pacman.changeDirection(`down`);
-      break;
-    case `ArrowLeft`:
-      pacman.changeDirection(`left`);
-      break;
-    case `ArrowRight`:
-      pacman.changeDirection(`right`);
-      break;
-  }
-});
+// ================================================ \\
 
-// changes pacman's direction based on screen control input \\
-document.getElementById(`controls`).addEventListener(`click`, e => {
-  const targetClass = e.target.className;
+function listenForInput() {
+  // changes pacman's direction based on keyboard input \\
+  document.addEventListener(`keydown`, e => {
+    switch (e.code) {
+      case `ArrowUp`:
+        pacman.changeDirection(`up`);
+        break;
+      case `ArrowDown`:
+        pacman.changeDirection(`down`);
+        break;
+      case `ArrowLeft`:
+        pacman.changeDirection(`left`);
+        break;
+      case `ArrowRight`:
+        pacman.changeDirection(`right`);
+        break;
+    }
+  });
 
-  switch (targetClass) {
-    case `control up`:
-      pacman.changeDirection(`up`);
-      break;
-    case `control down`:
-      pacman.changeDirection(`down`);
-      break;
-    case `control left`:
-      pacman.changeDirection(`left`);
-      break;
-    case `control right`:
-      pacman.changeDirection(`right`);
-      break;
-  }
-});
+  // changes pacman's direction based on screen control input \\
+  document.getElementById(`controls`).addEventListener(`click`, e => {
+    const targetClass = e.target.className;
+
+    switch (targetClass) {
+      case `control up`:
+        pacman.changeDirection(`up`);
+        break;
+      case `control down`:
+        pacman.changeDirection(`down`);
+        break;
+      case `control left`:
+        pacman.changeDirection(`left`);
+        break;
+      case `control right`:
+        pacman.changeDirection(`right`);
+        break;
+    }
+  });
+}
 
 // ================================================ \\
 
