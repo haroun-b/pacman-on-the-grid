@@ -57,6 +57,7 @@ main {
 
 /* cell */
 .cell {
+  border: 1px solid red;
   background-repeat: no-repeat;
   background-size: 100%;
 }
@@ -151,6 +152,44 @@ main {
   background-position: 50% 75%;
 }
 /* ======================================= */
+
+/* ======================================= */
+/* popup menu */
+
+#popup {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  flex-flow: column nowrap;
+  justify-content: center;
+  background-color: #ffbfa4f6;
+  color: #000;
+  text-align: center;
+  font-size: .75rem;
+  padding: .5rem 1.5rem;
+}
+
+[alt='instructions gif'] {
+  background-image: url('/resources/sprites/ghosts/blinky/blinky-down-1.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex-grow: 1;
+  margin: 0 auto;
+}
+
+#start-game {
+  all: unset;
+  font-size: 4rem;
+  background-color: #1c1c78;
+  color: #fff;
+  width: fit-content;
+  padding: 1rem 1.5rem;
+  margin: 0 auto;
+}
 
 /* ======================================= */
 /* media queries */

@@ -64,6 +64,8 @@ class Ghost extends Player {
   }
 }
 
+const ghosts = [];
+
 const ghostHome = {
   isClosed: true,
 
@@ -85,7 +87,7 @@ const game = {
   phMatrix: playground.flat(),
   phContainer: document.querySelector(`.physical.plane`),
   phCells: [],
-  spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1),
+  spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1), // !find a way to not use this
   spContainer: document.querySelector(`.spirits.plane`),
   spCells: [],
 
@@ -94,6 +96,18 @@ const game = {
 
   },
   start() {
+    this.renderWalls();
+    this.renderPh();
+    this.renderSp();
+
+    // setTimeout to allow the intro to play
+    setTimeout(() => {
+
+      setInterval(() => {
+        game.refresh();
+      }, 20);
+
+    }, 3000);
 
   },
   end() {
@@ -105,29 +119,39 @@ const game = {
   lose() {
 
   },
-  renderAll() {
+  renderSp() {
+    ghosts.forEach(ghost => {
+      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses}`;
+    });
+  },
+  renderPh() {
     for (let i = 0; i < this.phMatrix.length; i++) {
-      if (!this.phMatrix[i]) {
-        this.phCells[i].classList.add(`wall`);
-      }
-
-      if (this.phMatrix[i] === 3) {
-        this.phCells[i].classList.add(`power-up`);
-      }
-
-      if (this.phMatrix[i] === 2) {
-        this.phCells[i].classList.add(`pellet`);
+      switch (this.phMatrix[i]) {
+        case 1:
+          this.phCells[i].className = `cell`;
+          break;
+        case 2:
+          this.phCells[i].className = `cell pellet`;
+          break;
+        case 3:
+          this.phCells[i].className = `cell power-up`;
+          break;
+        case 8:
+          this.phCells[i].className = `cell ${pacman.getClasses}`;
+          break;
       }
     }
   },
   renderWalls() {
-    
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      if (this.phMatrix[i] === 0) {
+        this.phCells[i].className = `cell wall`;
+      }
+    }
   },
   buildCells() {
     this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
     this.spContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
-
-    console.log(this.width, this.height);
 
     for (let i = 0; i < this.phMatrix.length; i++) {
       const phCell = document.createElement(`div`);
@@ -137,7 +161,7 @@ const game = {
       spCell.className = `cell ghost`;
 
       // phCell.textContent = i.toString();
-      // spCell.textContent = i.toString();
+      spCell.textContent = i.toString();
 
 
       this.phCells.push(phCell);
@@ -149,9 +173,16 @@ const game = {
 }
 
 game.buildCells();
-game.renderAll();
+game.renderWalls();
+game.renderPh();
 
-window.addEventListener(`keydown`, e => {
+
+
+// ================================================ \\
+// event listeners \\
+
+// hides the on screen controls \\
+document.addEventListener(`keydown`, e => {
   const main = document.querySelector(`main`),
     controls = document.getElementById(`controls`);
 
@@ -160,3 +191,41 @@ window.addEventListener(`keydown`, e => {
 
   controls.style.display = `none`;
 }, { once: true });
+
+// changes pacman's direction based on keyboard input \\
+document.addEventListener(`keydown`, e => {
+  switch (e.code) {
+    case `ArrowUp`:
+
+      break;
+    case `ArrowDown`:
+
+      break;
+    case `ArrowLeft`:
+
+      break;
+    case `ArrowRight`:
+
+      break;
+  }
+});
+
+// changes pacman's direction based on screen control input \\
+document.getElementById(`controls`).addEventListener(`click`, e => {
+  const targetClass = e.target.className;
+
+  switch (targetClass) {
+    case `control up`:
+
+      break;
+    case `control down`:
+
+      break;
+    case `control left`:
+
+      break;
+    case `control right`:
+
+      break;
+  }
+});
