@@ -25,6 +25,9 @@ class Player {
   changeDirection(newDir) {
     this.direction = newDir;
   }
+  getClasses() {
+    return `${this.classes} ${this.direction}`;
+  }
 }
 
 // ================================================ \\
@@ -32,7 +35,7 @@ class Player {
 // ================================================ \\
 // pacman \\
 class PacMan extends Player {
-  constructor(name = `Pac-Man`, position = 325, direction = `r`, classes = `pacman`) {
+  constructor(name = `Pac-Man`, position = 325, direction = `right`, classes = `pacman`) {
     super(name, position, direction, classes);
     this.score = 0;
   }
@@ -42,10 +45,20 @@ class PacMan extends Player {
 
   }
   canMove() {
-
-  }
-  getClasses() {
-
+    switch (this.direction) {
+      case `up`:
+        return game.phMatrix[this.position - game.width]
+        break;
+      case `down`:
+        pacman.changeDirection(`down`);
+        break;
+      case `left`:
+        pacman.changeDirection(`left`);
+        break;
+      case `right`:
+        pacman.changeDirection(`right`);
+        break;
+    }
   }
 }
 
@@ -111,8 +124,8 @@ const game = {
   isLost: true,
   highScore: 0,
   pillsLeft: 0, // pills includes both the pellets and powerUps
-  width: playground.length,
-  height: playground[0].length,
+  width: playground[0].length,
+  height: playground.length,
   playgroundElement: document.getElementById(`playground`),
   phMatrix: playground.flat(),
   phContainer: document.querySelector(`.physical.plane`),
@@ -200,8 +213,8 @@ const game = {
   },
 
   buildCells() {
-    this.phContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
-    this.spContainer.style += `grid-template-rows: repeat(${this.width}, 1fr); grid-template-columns: repeat(${this.height}, 1fr);`
+    this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
+    this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
 
     for (let i = 0; i < this.phMatrix.length; i++) {
       const phCell = document.createElement(`div`);
@@ -210,8 +223,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      // phCell.textContent = i.toString();
-      // spCell.textContent = i.toString();
+      phCell.textContent = i.toString();
+      spCell.textContent = i.toString();
 
 
       this.phCells.push(phCell);
@@ -261,16 +274,16 @@ document.getElementById(`start-game`).addEventListener(`click`, e => {
 document.addEventListener(`keydown`, e => {
   switch (e.code) {
     case `ArrowUp`:
-      pacman.changeDirection(`u`);
+      pacman.changeDirection(`up`);
       break;
     case `ArrowDown`:
-      pacman.changeDirection(`d`);
+      pacman.changeDirection(`down`);
       break;
     case `ArrowLeft`:
-      pacman.changeDirection(`l`);
+      pacman.changeDirection(`left`);
       break;
     case `ArrowRight`:
-      pacman.changeDirection(`r`);
+      pacman.changeDirection(`right`);
       break;
   }
 });
@@ -281,16 +294,16 @@ document.getElementById(`controls`).addEventListener(`click`, e => {
 
   switch (targetClass) {
     case `control up`:
-      pacman.changeDirection(`u`);
+      pacman.changeDirection(`up`);
       break;
     case `control down`:
-      pacman.changeDirection(`d`);
+      pacman.changeDirection(`down`);
       break;
     case `control left`:
-      pacman.changeDirection(`l`);
+      pacman.changeDirection(`left`);
       break;
     case `control right`:
-      pacman.changeDirection(`r`);
+      pacman.changeDirection(`right`);
       break;
   }
 });
@@ -303,3 +316,5 @@ document.getElementById(`controls`).addEventListener(`click`, e => {
 game.buildCells();
 game.renderWalls();
 game.renderPh();
+
+console.log(game.width, game.height);
