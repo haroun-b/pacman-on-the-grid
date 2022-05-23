@@ -102,6 +102,7 @@ class Ghost extends Player {
     this.previousPosition = -1;
     this.scatterPosition = scatterPosition;
     this.homePosition = homePosition;
+    this.targetPosition = scatterPosition;
     this.isHome = true;
     this.isEatable = false;
     this.isEaten = false;
@@ -127,7 +128,8 @@ class Ghost extends Player {
   getTargetPosition() {
     // *every fifth wave the ghosts scatter
     if (game.wave % 5 === 0) {
-      return this.scatterPosition;
+      this.targetPosition = this.scatterPosition;
+      return;
     }
     // *when a ghost is eatable it picks a random empty cell to move towards
     if (this.isEatable) {
@@ -137,14 +139,16 @@ class Ghost extends Player {
           .filter(cell => cell >= 0);
 
       const randomTargetPosition = notWalls[Math.floor(Math.random() * notWalls.length)];
-      return randomTargetPosition;
+      this.targetPosition = randomTargetPosition;
+      return;
     }
 
     if (this.isEaten) {
-      return this.homePosition;
+      this.targetPosition = this.homePosition;
+      return;
     }
 
-    return this.getHuntPosition();
+    this.targetPosition = this.getHuntPosition();
   }
   // TODO
   changeDirection() {
@@ -152,14 +156,15 @@ class Ghost extends Player {
       return;
     }
 
-    const targetPosition = this.getTargetPosition();
-
-    const distance = this.position - targetPosition;
+    // *so targetPosition can be changed to previous position when there's a state change
+    this.getTargetPosition();
+    
+    const distance = this.position - this.targetPosition;
     // !here bookmark
     // TODO move to the previous cell whenever there is a state change
     // ghost on top
     if (distance < 0 && this.canMove(`down`)) {
-      
+      // if 
 
       if (this.position + game.width !== this.previousPosition) {}
     }
@@ -197,9 +202,11 @@ class Ghost extends Player {
 
   makeEatable() {
     this.isEatable = true;
+    this.targetPosition = this.previousPosition;
 
     setTimeout(() => {
       this.isEatable = false;
+      this.targetPosition = this.previousPosition;
     }, 7000);
   }
 
