@@ -97,22 +97,18 @@ class PacMan extends Player {
 // ================================================ \\
 // the ghosts \\
 class Ghost extends Player {
-  constructor(name, position, direction, reward, home) {
+  constructor(name, position, direction, reward, homePosition, scatterPosition) {
     super(name, position, direction);
-    this.home = home;
+    this.previousPosition = -1;
+    this.scatterPosition = scatterPosition;
+    this.homePosition = homePosition;
     this.isHome = true;
     this.isEatable = false;
     this.isEaten = false;
     this.reward = reward;
   }
 
-  hunt() {  //! ghost spesific
-
-  }
-
-  scatter() {  //! ghost spesific
-
-  }
+  
 
   move() {
     // TODO move is the only access point from game obj
@@ -121,6 +117,54 @@ class Ghost extends Player {
     // TODO leave home if home
     // TODO scatter when eatable
     // TODO hunt otherwise
+  }
+
+  getHuntPosition() {  //! ghost spesific
+    return pacman.position;
+  }
+
+  // TODO mutate getHuntPosition for all the different ghosts other than blinky
+  getTargetPosition() {
+    // *every fifth wave the ghosts scatter
+    if (game.wave % 5 === 0) {
+      return this.scatterPosition;
+    }
+    // *when a ghost is eatable it picks a random empty cell to move towards
+    if (this.isEatable) {
+      const notWalls =
+        phMatrix
+          .map((cell, index) => cell > 0 ? index : -1)
+          .filter(cell => cell >= 0);
+
+      const randomTargetPosition = notWalls[Math.floor(Math.random() * notWalls.length)];
+      return randomTargetPosition;
+    }
+
+    if (this.isEaten) {
+      return this.homePosition;
+    }
+
+    return this.getHuntPosition();
+  }
+  // TODO
+  changeDirection() {
+    if (!this.atIntersection()) {
+      return;
+    }
+
+    const targetPosition = this.getTargetPosition();
+
+    const distance = this.position - targetPosition;
+    // !here bookmark
+    // TODO move to the previous cell whenever there is a state change
+    // ghost on top
+    if (distance < 0 && this.canMove(`down`)) {
+      
+
+      if (this.position + game.width !== this.previousPosition) {}
+    }
+
+    // TODO when eaten the ghost walk through walls
   }
 
   atIntersection() {
@@ -196,8 +240,10 @@ const ghostHome = {
 
 const game = {
   hasStarted: false,  // !might go unused
+  intervalIds: [],
   highScore: 0,
   score: 0,
+  wave: 0,
   pillsLeft: { pellets: 0, powerUps: 0 },
   width: playground[0].length,
   height: playground.length,
@@ -238,9 +284,13 @@ const game = {
     // setTimeout to allow the intro to play
     setTimeout(() => {
 
-      setInterval(() => {
+      const refreshIntervalId = setInterval(() => {
         game.refresh();
       }, 20);
+      // !when wave % 5 === 0 scatter
+      const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
+
+      this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
 
       listenForInput();
 
