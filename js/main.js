@@ -109,7 +109,7 @@ class Ghost extends Player {
     this.reward = reward;
   }
 
-  
+
 
   move() {
     // TODO move is the only access point from game obj
@@ -122,6 +122,10 @@ class Ghost extends Player {
 
   getHuntPosition() {  //! ghost spesific
     return pacman.position;
+  }
+
+  canMove() {
+    
   }
 
   // TODO mutate getHuntPosition for all the different ghosts other than blinky
@@ -151,23 +155,60 @@ class Ghost extends Player {
     this.targetPosition = this.getHuntPosition();
   }
   // TODO
-  changeDirection() {
+  changeDirection(priorityAxis) {
     if (!this.atIntersection()) {
       return;
     }
 
+    // !tocheck: move to the previous cell whenever there is a state change
     // *so targetPosition can be changed to previous position when there's a state change
     this.getTargetPosition();
-    
-    const distance = this.position - this.targetPosition;
-    // !here bookmark
-    // TODO move to the previous cell whenever there is a state change
-    // ghost on top
-    if (distance < 0 && this.canMove(`down`)) {
-      // if 
 
-      if (this.position + game.width !== this.previousPosition) {}
+    const distance = this.position - this.targetPosition,
+      targetIsOnSameRow = Math.floor(this.position / game.width) === Math.floor(this.targetPosition / game.width),
+      targetIsPrevious = this.previousPosition === this.targetPosition,
+      upIsPrevious = this.position - game.width === this.previousPosition,
+      downIsPrevious = this.position + game.width === this.previousPosition,
+      leftIsPrevious = this.position % game.width === 0 ? this.position + (game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
+      rightIsPrevious = (this.position + 1) % game.width === 0 ? this.position - (game.width - 1) === this.previousPosition : this.position + 1 === this.previousPosition;
+
+    if (priorityAxis === undefined) {
+      priorityAxis = targetIsOnSameRow ? `xAxis` : `yAxis`;
     }
+    // vertical movement
+    // move down
+    if (priorityAxis === `yAxis`) {
+      if (distance < 0 && this.canMove(`down`)) {
+        if (!downIsPrevious || targetIsPrevious) {
+          this.direction = `down`;
+          return;
+        }
+      }
+      // move up
+      if (distance > 0 && this.canMove(`up`)) {
+        if (!upIsPrevious || targetIsPrevious) {
+          this.direction = `up`;
+          return;
+        }
+      }
+    }
+
+    // move left
+    if (distance > 0 && this.canMove(`left`)) {
+      if (!leftIsPrevious || targetIsPrevious) {
+        this.direction = `left`;
+        return;
+      }
+    }
+    // move right
+    if (distance < 0 && this.canMove(`right`)) {
+      if (!rightIsPrevious || targetIsPrevious) {
+        this.direction = `right`;
+        return;
+      }
+    }
+
+    this.changeDirection(`yAxis`);
 
     // TODO when eaten the ghost walk through walls
   }
@@ -361,8 +402,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      // phCell.textContent = i.toString();
-      // spCell.textContent = i.toString();
+      phCell.textContent = i.toString();
+      spCell.textContent = i.toString();
 
 
       this.phCells.push(phCell);
