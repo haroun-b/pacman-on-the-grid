@@ -24,6 +24,7 @@ const game = {
   highScore: 0,
   highScoreElement: document.querySelector(`.high.score span`),
   score: 0,
+  counter: 0, // !find a better name or solution for slowing eatable ghosts
   scoreElement: document.querySelector(`.player.score span`),
   wave: 0,
   pillsLeft: { pellets: 179, powerUps: 4 },
@@ -44,18 +45,16 @@ const game = {
 
     this.countPills();
     // TODO check if ghost is eatable if so update score and sendHome else lose
-    const isLost = ghosts.some(ghost => ghost.position === pacman.position);  // TODO replace with detectEncounter()
-
-    if (isLost) {
-      this.lose();
-    }
+    this.detectEncounter();
+    
     if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
       this.win();
     }
 
     this.renderPh();
     this.renderSp();
-    this.updateScore(); //TODO
+
+    this.counter > 10 ? this.counter = 0 : this.counter++;
   },
 
   start() {
@@ -92,6 +91,7 @@ const game = {
 
   lose() {
     // TODO
+    console.log(`lost`);
   },
   // *checked
   renderSp() {
@@ -153,7 +153,7 @@ const game = {
       this.spContainer.appendChild(spCell);
     }
   },
-
+  // *checked
   countPills() {
     let newPelletCount = 0,
       newPowerUpCount = 0;
@@ -168,18 +168,15 @@ const game = {
           break;
       }
     });
-    console.log(newPelletCount, this.pillsLeft.pellets);
 
     if (this.pillsLeft.pellets > newPelletCount) {
-      console.log(`boop`);
-      console.log((this.pillsLeft.pellets - newPelletCount) * 10);
       this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
 
       this.pillsLeft.pellets = newPelletCount;
       // TODO play appropriate sound
     }
     if (this.pillsLeft.powerUps > newPowerUpCount) {
-      this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
+      this.updateScore((this.pillsLeft.powerUps - newPowerUpCount) * 50);
 
       this.pillsLeft.powerUps = newPowerUpCount;
 
@@ -187,27 +184,25 @@ const game = {
       // TODO play appropriate sound
     }
   },
-
+  // *checked
   updateScore(points) {
-    this.scoreElement.textContent = `${this.score}  +${points}`;
-
-
     this.score += points;
+
+    this.scoreElement.textContent = this.score.toString();
 
     if (this.score > this.highScore) {
       this.highScore = this.score;
       this.highScoreElement.textContent = this.highScore.toString();
     }
-
   },
-
+  // *checked
   detectEncounter() {
     for (let ghost of ghosts) {
       if (ghost.position !== pacman.position) {
         continue;
       }
 
-      if (!ghost.isEatable && !isEaten) {
+      if (!ghost.isEatable && !ghost.isEaten) {
         this.lose();
       } else {
         ghost.getEaten();
@@ -243,6 +238,7 @@ class Player {
       case `up`:
         return this.game.phMatrix[this.position - this.game.width] !== 0;
       case `down`:  // going inside the ghost home is not allowed
+      // TODO dry this one
         return this.game.phMatrix[this.position] === 4 ? false : this.game.phMatrix[this.position + this.game.width] !== 0;
       case `left`:
         if (this.position % this.game.width === 0) {
@@ -288,6 +284,7 @@ class PacMan extends Player {
 
   // * move is the only access point from game obj
   move() {
+    console.log(this.position, this.direction);
     if (this.canMove()) {
       this.game.phMatrix[this.position] = 1;
 
@@ -326,6 +323,9 @@ class Ghost extends Player {
   }
 
   move() {
+    if (this.isEatable && this.game.counter % 2 === 0) {
+      return;
+    }
     // * move is the only access point from game obj
     this.changeDirection();
 
@@ -367,7 +367,7 @@ class Ghost extends Player {
     // *when a ghost is eatable it picks a random empty cell to move towards
     if (this.isEatable) {
       const notWalls =
-        phMatrix
+        this.game.phMatrix
           .map((cell, index) => cell > 0 ? index : -1)
           .filter(cell => cell >= 0);
 
