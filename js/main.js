@@ -3,11 +3,12 @@ wall: 0,
 emptySpace: 1,
 pellet: 2,
 powerUp: 3,
-blinky: 4,
-pinky: 5,
-inky: 6,
-clyde: 7,
-pacMan: 8,
+ghostHomeEntrance: 4,
+blinky: 5,
+pinky: 6,
+inky: 7,
+clyde: 8,
+pacMan: 9,
 */
 
 // ================================================ \\
@@ -32,8 +33,8 @@ class Player {
     switch (direction) {
       case `up`:
         return game.phMatrix[this.position - game.width] !== 0;
-      case `down`:
-        return game.phMatrix[this.position + game.width] !== 0;
+      case `down`:  // going inside the ghost home is not allowed
+        return game.phMatrix[this.position] === 4 ? false : game.phMatrix[this.position + game.width] !== 0;
       case `left`:
         if (this.position % game.width === 0) {
           return game.phMatrix[this.position + (game.width - 1)] !== 0;
@@ -87,7 +88,7 @@ class PacMan extends Player {
           break;
       }
 
-      game.phMatrix[this.position] = 8;
+      game.phMatrix[this.position] = 9;
     }
   }
 }
@@ -101,8 +102,8 @@ class Ghost extends Player {
     super(name, position, direction);
     this.previousPosition = -1;
     this.scatterPosition = scatterPosition;
-    this.homePosition = homePosition;
     this.targetPosition = scatterPosition;
+    this.homePosition = homePosition;
     this.isHome = true;
     this.isEatable = false;
     this.isEaten = false;
@@ -113,7 +114,7 @@ class Ghost extends Player {
   leaveHome() {
     // TODO
   }
-  
+
   move() {
     // TODO move is the only access point from game obj
     // TODO move is only called at intersections
@@ -134,6 +135,9 @@ class Ghost extends Player {
   }
 
   getTargetPosition() {
+    if (isHome) {
+
+    }
     // *every fifth wave the ghosts scatter
     if (game.wave % 5 === 0) {
       this.targetPosition = this.scatterPosition;
@@ -361,6 +365,7 @@ const game = {
     for (let i = 0; i < this.phMatrix.length; i++) {
       switch (this.phMatrix[i]) {
         case 1:
+        case 4:
           this.phCells[i].className = `cell`;
           break;
         case 2:
@@ -369,7 +374,7 @@ const game = {
         case 3:
           this.phCells[i].className = `cell power-up`;
           break;
-        case 8:
+        case 9:
           this.phCells[i].className = `cell ${pacman.getClasses()}`;
           break;
       }
