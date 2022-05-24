@@ -1,4 +1,6 @@
 /*
+name:  numberInGame
+
 wall: 0,
 emptySpace: 1,
 pellet: 2,
@@ -16,9 +18,9 @@ pacMan: 9,
 // ================================================ \\
 // player \\
 class Player {
-  constructor(name, position, direction, classes) {
+  constructor(game, name, direction, classes) {
+    this.game = game;
     this.name = name;
-    this.position = position;
     this.direction = direction;
     this.classes = classes;
   }
@@ -32,21 +34,45 @@ class Player {
   canMove(direction = this.direction) {
     switch (direction) {
       case `up`:
-        return game.phMatrix[this.position - game.width] !== 0;
+        return this.game.phMatrix[this.position - this.game.width] !== 0;
       case `down`:  // going inside the ghost home is not allowed
-        return game.phMatrix[this.position] === 4 ? false : game.phMatrix[this.position + game.width] !== 0;
+        return this.game.phMatrix[this.position] === 4 ? false : this.game.phMatrix[this.position + this.game.width] !== 0;
       case `left`:
-        if (this.position % game.width === 0) {
-          return game.phMatrix[this.position + (game.width - 1)] !== 0;
+        if (this.position % this.game.width === 0) {
+          return this.game.phMatrix[this.position + (this.game.width - 1)] !== 0;
         } else {
           return game.phMatrix[this.position - 1] !== 0;
         }
       case `right`:
-        if ((this.position + 1) % game.width === 0) {
-          return game.phMatrix[this.position - (game.width - 1)] !== 0;
+        if ((this.position + 1) % this.game.width === 0) {
+          return this.game.phMatrix[this.position - (this.game.width - 1)] !== 0;
         } else {
-          return game.phMatrix[this.position + 1] !== 0;
+          return this.game.phMatrix[this.position + 1] !== 0;
         }
+    }
+  }
+  move() {
+    switch (this.direction) {
+      case `up`:
+        this.position -= this.game.width;
+        break;
+      case `down`:
+        this.position + this.game.width;
+        break;
+      case `left`:
+        if (this.position % this.game.width === 0) {
+          this.position += (this.game.width - 1);
+        } else {
+          this.position--;
+        }
+        break;
+      case `right`:
+        if ((this.position + 1) % this.game.width === 0) {
+          this.position -= (this.game.width - 1);
+        } else {
+          this.position++;
+        }
+        break;
     }
   }
 }
@@ -56,77 +82,56 @@ class Player {
 // ================================================ \\
 // pacman \\
 class PacMan extends Player {
-  constructor(name = `Pac-Man`, position = 325, direction = `right`, classes = `pacman`) {
-    super(name, position, direction, classes);
+  constructor(game, name = `Pac-Man`, direction = `right`, classes = `pacman`, numberInGame = 9) {
+    super(game, name, direction, classes);
+    this.position = game.indexOf(numberInGame);
   }
 
   // * move is the only access point from game obj
   move() {
     if (this.canMove()) {
-      game.phMatrix[this.position] = 1;
+      this.game.phMatrix[this.position] = 1;
 
-      switch (this.direction) {
-        case `up`:
-          this.position -= game.width;
-          break;
-        case `down`:
-          this.position + game.width;
-          break;
-        case `left`:
-          if (this.position % game.width === 0) {
-            this.position += (game.width - 1);
-          } else {
-            this.position--;
-          }
-          break;
-        case `right`:
-          if ((this.position + 1) % game.width === 0) {
-            this.position -= (game.width - 1);
-          } else {
-            this.position++;
-          }
-          break;
-      }
+      super.move();
 
-      game.phMatrix[this.position] = 9;
+      this.game.phMatrix[this.position] = 9;
     }
   }
 }
+
+const pacman = new Pacman();
 
 // ================================================ \\
 
 // ================================================ \\
 // the ghosts \\
 class Ghost extends Player {
-  constructor(name, position, direction, reward, homePosition, scatterPosition) {
-    super(name, position, direction);
-    this.previousPosition = -1;
-    this.scatterPosition = scatterPosition;
-    this.targetPosition = scatterPosition;
+  constructor(game, name, direction, classes, isHome = true, homePosition, scatterPosition, position, reward) {
+    super(game, name, direction, classes);
+    this.homeEntrance = game.phMatrix.indexOf(4);
+    this.isHome = isHome;
     this.homePosition = homePosition;
-    this.isHome = true;
+    this.scatterPosition = scatterPosition;
+    this.position = this.position;
+    this.previousPosition = -1;
+    this.targetPosition = scatterPosition;
     this.isEatable = false;
     this.isEaten = false;
     this.reward = reward;
   }
 
-
-  leaveHome() {
-    // TODO
-  }
-
-  move() {
-    // TODO move is the only access point from game obj
-    // TODO move is only called at intersections
-    // TODO move calls goHome() when isEaten === true
-    // TODO leave home if home
-    // TODO scatter when eatable
-    // TODO hunt otherwise
-  }
-
   // TODO mutate getHuntPosition for all the different ghosts other than blinky
   getHuntPosition() {  //! ghost spesific
     return pacman.position;
+  }
+
+  move() {
+    // * move is the only access point from game obj
+    this.changeDirection();
+
+    this.previousPosition = this.position;
+    super.move();
+
   }
 
   canMove(direction = this.direction) {
@@ -136,11 +141,7 @@ class Ghost extends Player {
 
   getTargetPosition() {
     if (isHome) {
-
-    }
-    // *every fifth wave the ghosts scatter
-    if (game.wave % 5 === 0) {
-      this.targetPosition = this.scatterPosition;
+      this.targetPosition = this.homeEntrance;
       return;
     }
     // *when a ghost is eatable it picks a random empty cell to move towards
@@ -154,37 +155,43 @@ class Ghost extends Player {
       this.targetPosition = randomTargetPosition;
       return;
     }
-
+    // *when eaten the ghost goes home
     if (this.isEaten) {
       this.targetPosition = this.homePosition;
       return;
     }
 
+    // *every fifth wave the ghosts scatter
+    if (this.game.wave % 5 === 0) {
+      this.targetPosition = this.scatterPosition;
+      return;
+    }
+
     this.targetPosition = this.getHuntPosition();
   }
-  // TODO
+
   changeDirection(priorityAxis) {
+    // *direction is only changed at intersections
     if (!this.atIntersection()) {
       return;
     }
 
-    // !tocheck: move to the previous cell whenever there is a state change
     // *so targetPosition can be changed to previous position when there's a state change
     this.getTargetPosition();
 
     const distance = this.position - this.targetPosition,
-      targetIsOnSameRow = Math.floor(this.position / game.width) === Math.floor(this.targetPosition / game.width),
+      targetIsOnSameRow = Math.floor(this.position / this.game.width) === Math.floor(this.targetPosition / this.game.width),
       targetIsPrevious = this.previousPosition === this.targetPosition,
-      upIsPrevious = this.position - game.width === this.previousPosition,
-      downIsPrevious = this.position + game.width === this.previousPosition,
-      leftIsPrevious = this.position % game.width === 0 ? this.position + (game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
-      rightIsPrevious = (this.position + 1) % game.width === 0 ? this.position - (game.width - 1) === this.previousPosition : this.position + 1 === this.previousPosition;
+      upIsPrevious = this.position - this.game.width === this.previousPosition,
+      downIsPrevious = this.position + this.game.width === this.previousPosition,
+      leftIsPrevious = this.position % this.game.width === 0 ? this.position + (this.game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
+      rightIsPrevious = (this.position + 1) % this.game.width === 0 ? this.position - (this.game.width - 1) === this.previousPosition : this.position + 1 === this.previousPosition;
 
     if (priorityAxis === undefined) {
       priorityAxis = targetIsOnSameRow ? `xAxis` : `yAxis`;
     }
-    // vertical movement
-    // move down
+    // vertical direction
+    // down
     if (priorityAxis === `yAxis`) {
       if (distance < 0 && this.canMove(`down`)) {
         if (!downIsPrevious || targetIsPrevious) {
@@ -192,7 +199,7 @@ class Ghost extends Player {
           return;
         }
       }
-      // move up
+      // up
       if (distance > 0 && this.canMove(`up`)) {
         if (!upIsPrevious || targetIsPrevious) {
           this.direction = `up`;
@@ -201,14 +208,15 @@ class Ghost extends Player {
       }
     }
 
-    // move left
+    // horizontal direction
+    // left
     if (distance > 0 && this.canMove(`left`)) {
       if (!leftIsPrevious || targetIsPrevious) {
         this.direction = `left`;
         return;
       }
     }
-    // move right
+    // right
     if (distance < 0 && this.canMove(`right`)) {
       if (!rightIsPrevious || targetIsPrevious) {
         this.direction = `right`;
@@ -235,7 +243,7 @@ class Ghost extends Player {
     this.isEatable = false;
     this.isEaten = true;
 
-    game.updateScore(this.reward);
+    this.game.updateScore(this.reward);
   }
 
   makeEatable() {
@@ -260,16 +268,6 @@ class Ghost extends Player {
 }
 
 
-const ghostHome = {
-  isClosed: true,
-
-  open() {
-
-  },
-  close() {
-
-  }
-}
 // TODO uncomment
 // const ghosts = [
 //   new Blinky(),
@@ -322,24 +320,25 @@ const game = {
   },
 
   start() {
+    this.buildCells();
     this.renderWalls();
     this.renderPh();
     this.renderSp();
 
     // setTimeout to allow the intro to play
-    setTimeout(() => {
+    // setTimeout(() => {
 
-      const refreshIntervalId = setInterval(() => {
-        game.refresh();
-      }, 20);
-      // !when wave % 5 === 0 scatter
-      const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
+    //   const refreshIntervalId = setInterval(() => {
+    //     game.refresh();
+    //   }, 20);
+    //   // !when wave % 5 === 0 scatter
+    //   const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
 
-      this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
+    //   this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
 
-      listenForInput();
+    //   listenForInput();
 
-    }, 3000);
+    // }, 3000);
 
   },
 
@@ -358,6 +357,7 @@ const game = {
   renderSp() {
     ghosts.forEach(ghost => {
       this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
+      this.spCells[ghost.previousPosition].className = `cell ghost`;
     });
   },
 
@@ -380,7 +380,7 @@ const game = {
       }
     }
   },
-
+  // *checked
   renderWalls() {
     for (let i = 0; i < this.phMatrix.length; i++) {
       if (this.phMatrix[i] === 0) {
@@ -529,8 +529,9 @@ function listenForInput() {
 // ================================================ \\
 // testing zone \\
 
-game.buildCells();
-game.renderWalls();
-game.renderPh();
+// game.buildCells();
+// game.renderWalls();
+// game.renderPh();
 
+game.start();
 console.log(game.width, game.height);
