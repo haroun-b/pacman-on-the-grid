@@ -22,9 +22,11 @@ const game = {
   hasStarted: false,  // !might go unused
   intervalIds: [],
   highScore: 0,
+  highScoreElement: document.querySelector(`.high.score span`),
   score: 0,
+  scoreElement: document.querySelector(`.player.score span`),
   wave: 0,
-  pillsLeft: { pellets: 0, powerUps: 0 },
+  pillsLeft: { pellets: 179, powerUps: 4 },
   width: playground[0].length,
   height: playground.length,
   playgroundElement: document.getElementById(`playground`),
@@ -67,7 +69,7 @@ const game = {
 
       const refreshIntervalId = setInterval(() => {
         game.refresh();
-      }, 200);
+      }, 190);
       // !when wave % 5 === 0 scatter
       const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
 
@@ -81,6 +83,7 @@ const game = {
 
   end() {
     // TODO
+    this.intervalIds.forEach(id => { clearInterval(id) });
   },
 
   win() {
@@ -90,16 +93,17 @@ const game = {
   lose() {
     // TODO
   },
-
+  // *checked
   renderSp() {
     ghosts.forEach(ghost => {
       this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
+      // resets previous cell
       if (ghost.previousPosition >= 0) {
         this.spCells[ghost.previousPosition].className = `cell ghost`;
       }
     });
   },
-
+  // *checked
   renderPh() {
     for (let i = 0; i < this.phMatrix.length; i++) {
       switch (this.phMatrix[i]) {
@@ -127,7 +131,7 @@ const game = {
       }
     }
   },
-
+  // *checked
   buildCells() {
     this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
     this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
@@ -139,8 +143,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      // phCell.textContent = i.toString();
-      // spCell.textContent = i.toString();
+      // phCell.textContent = i.toString(); // TODO: delete this line
+      // spCell.textContent = i.toString(); // TODO: delete this line
 
 
       this.phCells.push(phCell);
@@ -155,37 +159,52 @@ const game = {
       newPowerUpCount = 0;
 
     this.phMatrix.forEach(cell => {
-      if (cell === 2) {
-        newPelletCount++;
-      }
-      if (cell === 3) {
-        newPowerUpCount++;
+      switch (cell) {
+        case 2:
+          newPelletCount++;
+          break;
+        case 3:
+          newPowerUpCount++;
+          break;
       }
     });
+    console.log(newPelletCount, this.pillsLeft.pellets);
 
     if (this.pillsLeft.pellets > newPelletCount) {
+      console.log(`boop`);
+      console.log((this.pillsLeft.pellets - newPelletCount) * 10);
       this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
+
       this.pillsLeft.pellets = newPelletCount;
       // TODO play appropriate sound
     }
     if (this.pillsLeft.powerUps > newPowerUpCount) {
       this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
+
       this.pillsLeft.powerUps = newPowerUpCount;
 
       ghosts.forEach(ghost => { ghost.makeEatable() });
       // TODO play appropriate sound
     }
   },
-  // TODO it takes points and adds them to the score updates the high score and displays them
-  // TODO it displays +reward next to the score when a ghost is eaten
-  updateScore() {
+
+  updateScore(points) {
+    this.scoreElement.textContent = `${this.score}  +${points}`;
+
+
+    this.score += points;
+
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      this.highScoreElement.textContent = this.highScore.toString();
+    }
 
   },
 
   detectEncounter() {
-    ghosts.forEach(ghost => {
+    for (let ghost of ghosts) {
       if (ghost.position !== pacman.position) {
-        return;
+        continue;
       }
 
       if (!ghost.isEatable && !isEaten) {
@@ -193,7 +212,7 @@ const game = {
       } else {
         ghost.getEaten();
       }
-    });
+    }
   }
 }
 
@@ -214,9 +233,11 @@ class Player {
   changeDirection(newDir) {
     this.direction = newDir;
   }
+  // *checked
   getClasses() {
     return `${this.classes} ${this.direction}`;
   }
+  // *checked
   canMove(direction = this.direction) {
     switch (direction) {
       case `up`:
@@ -246,18 +267,10 @@ class Player {
         this.position += this.game.width;
         break;
       case `left`:
-        if (this.position % this.game.width === 0) {
-          this.position += (this.game.width - 1);
-        } else {
-          this.position--;
-        }
+        this.position % this.game.width === 0 ? this.position += (this.game.width - 1) : this.position--;
         break;
       case `right`:
-        if ((this.position + 1) % this.game.width === 0) {
-          this.position -= (this.game.width - 1);
-        } else {
-          this.position++;
-        }
+        (this.position + 1) % this.game.width === 0 ? this.position -= (this.game.width - 1) : this.position++
         break;
     }
   }
@@ -292,7 +305,7 @@ const pacman = new PacMan(game);
 // ================================================ \\
 // the ghosts \\
 class Ghost extends Player {
-  constructor(game, name, direction, classes, isHome = true, homePosition, scatterPosition, position, reward) {
+  constructor(game, name, direction, classes, isHome = true, homePosition, scatterPosition, position, reward, pacman) {
     super(game, name, direction, classes);
     this.homeEntrance = game.phMatrix.indexOf(4);
     this.isHome = isHome;
@@ -304,11 +317,12 @@ class Ghost extends Player {
     this.isEatable = false;
     this.isEaten = false;
     this.reward = reward;
+    this.pacman = pacman;
   }
 
   // TODO mutate getHuntPosition for all the different ghosts other than blinky
-  getHuntPosition() {  //! ghost spesific
-    return pacman.position;
+  getHuntPosition() {  //! ghost specific
+    return this.pacman.position;
   }
 
   move() {
@@ -323,6 +337,26 @@ class Ghost extends Player {
   canMove(direction = this.direction) {
     // eaten ghosts can move through walls
     return this.isEaten ? true : super.canMove(direction);
+  }
+
+  getDirectionOfPrevious() {
+    const upIsPrevious = this.position - this.game.width === this.previousPosition,
+      downIsPrevious = this.position + this.game.width === this.previousPosition,
+      leftIsPrevious = this.position % this.game.width === 0 ? this.position + (this.game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
+      rightIsPrevious = (this.position + 1) % this.game.width === 0 ? this.position - (this.game.width - 1) === this.previousPosition : this.position + 1 === this.previousPosition;
+
+    if (upIsPrevious) {
+      return `up`;
+    }
+    if (downIsPrevious) {
+      return `down`;
+    }
+    if (leftIsPrevious) {
+      return `left`;
+    }
+    if (rightIsPrevious) {
+      return `right`;
+    }
   }
 
   getTargetPosition() {
@@ -356,73 +390,50 @@ class Ghost extends Player {
     this.targetPosition = this.getHuntPosition();
   }
 
-  changeDirection(priorityAxis) {
-    // *direction is only changed at intersections
-    if (!this.atIntersection()) {
+  changeDirection() {
+    let clearPaths = this.getClearPaths();
+
+    // *direction is only changed at intersections. ie 3 or more clearPaths
+    if (clearPaths.length < 3 && this.canMove(this.direction)) {
       return;
     }
 
     // *so targetPosition can be changed to previous position when there's a state change
     this.getTargetPosition();
 
-    const distance = this.position - this.targetPosition,
-      targetIsOnSameRow = Math.floor(this.position / this.game.width) === Math.floor(this.targetPosition / this.game.width),
-      targetIsPrevious = this.previousPosition === this.targetPosition,
-      upIsPrevious = this.position - this.game.width === this.previousPosition,
-      downIsPrevious = this.position + this.game.width === this.previousPosition,
-      leftIsPrevious = this.position % this.game.width === 0 ? this.position + (this.game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
-      rightIsPrevious = (this.position + 1) % this.game.width === 0 ? this.position - (this.game.width - 1) === this.previousPosition : this.position + 1 === this.previousPosition;
+    const yDistance = Math.floor(this.position / this.game.width) - Math.floor(this.targetPosition / this.game.width),
+      xDistance = this.position % this.game.width - this.targetPosition % this.game.width,
+      targetIsPrevious = this.previousPosition === this.targetPosition;
 
-    if (priorityAxis === undefined) {
-      priorityAxis = targetIsOnSameRow ? `xAxis` : `yAxis`;
-    }
-    // vertical direction
-    // down
-    if (priorityAxis === `yAxis`) {
-      if (distance < 0 && this.canMove(`down`)) {
-        if (!downIsPrevious || targetIsPrevious) {
-          this.direction = `down`;
-          return;
-        }
-      }
-      // up
-      if (distance > 0 && this.canMove(`up`)) {
-        if (!upIsPrevious || targetIsPrevious) {
-          this.direction = `up`;
-          return;
-        }
-      }
+    if (!targetIsPrevious) {
+      clearPaths = clearPaths.filter(path => path !== this.getDirectionOfPrevious());
     }
 
-    // horizontal direction
-    // left
-    if (distance > 0 && this.canMove(`left`)) {
-      if (!leftIsPrevious || targetIsPrevious) {
-        this.direction = `left`;
-        return;
+    const absYDistance = Math.abs(yDistance),
+      absXDistance = Math.abs(xDistance);
+
+    console.log(clearPaths);  // TODO: remove this line
+
+    this.direction = clearPaths.find((path, index) => {
+      if (index === clearPaths.length - 1) {
+        return true;
       }
-    }
-    // right
-    if (distance < 0 && this.canMove(`right`)) {
-      if (!rightIsPrevious || targetIsPrevious) {
-        this.direction = `right`;
-        return;
-      }
-    }
 
-    this.changeDirection(`yAxis`);
-  }
-
-  atIntersection() {
-    let clearPaths = 0;
-
-    [`up`, `down`, `left`, `right`].forEach(dir => {
-      if (this.canMove(dir)) {
-        clearPaths++;
+      switch (path) {
+        case `down`:
+          return yDistance < 0 && absYDistance >= absXDistance;
+        case `up`:
+          return yDistance > 0 && absYDistance >= absXDistance;
+        case `left`:
+          return xDistance > 0 && absYDistance <= absXDistance;
+        case `right`:
+          return xDistance < 0 && absYDistance <= absXDistance;
       }
     });
+  }
 
-    return clearPaths >= 3 ? true : false;
+  getClearPaths() {
+    return [`up`, `down`, `left`, `right`].filter(path => this.canMove(path));
   }
 
   getEaten() {
@@ -462,7 +473,7 @@ class Ghost extends Player {
 //   new Clyde()
 // ];
 
-const ghosts = [new Ghost(game, `Blinky`, `left`, `blinky`, isHome = false, 199, 0, 157, 200)];
+const ghosts = [new Ghost(game, `Blinky`, `left`, `blinky`, isHome = false, 199, 0, 157, 200, pacman)];
 
 // ================================================ \\
 
@@ -538,3 +549,10 @@ function listenForInput() {
 // game.renderPh();
 
 game.start();
+
+document.addEventListener(`keydown`, e => {
+  switch (e.code) {
+    case `KeyH`:
+      game.end();
+  }
+});
