@@ -28,8 +28,8 @@ class Player {
   getClasses() {
     return `${this.classes} ${this.direction}`;
   }
-  canMove() {
-    switch (this.direction) {
+  canMove(direction = this.direction) {
+    switch (direction) {
       case `up`:
         return game.phMatrix[this.position - game.width] !== 0;
       case `down`:
@@ -110,7 +110,10 @@ class Ghost extends Player {
   }
 
 
-
+  leaveHome() {
+    // TODO
+  }
+  
   move() {
     // TODO move is the only access point from game obj
     // TODO move is only called at intersections
@@ -120,15 +123,16 @@ class Ghost extends Player {
     // TODO hunt otherwise
   }
 
+  // TODO mutate getHuntPosition for all the different ghosts other than blinky
   getHuntPosition() {  //! ghost spesific
     return pacman.position;
   }
 
-  canMove() {
-    
+  canMove(direction = this.direction) {
+    // eaten ghosts can move through walls
+    return this.isEaten ? true : super.canMove(direction);
   }
 
-  // TODO mutate getHuntPosition for all the different ghosts other than blinky
   getTargetPosition() {
     // *every fifth wave the ghosts scatter
     if (game.wave % 5 === 0) {
@@ -209,8 +213,6 @@ class Ghost extends Player {
     }
 
     this.changeDirection(`yAxis`);
-
-    // TODO when eaten the ghost walk through walls
   }
 
   atIntersection() {
@@ -223,15 +225,6 @@ class Ghost extends Player {
     });
 
     return clearPaths >= 3 ? true : false;
-  }
-
-  leaveHome() {
-    // TODO
-  }
-
-  goHome() {
-    // TODO
-
   }
 
   getEaten() {
