@@ -57,7 +57,7 @@ main {
 
 /* cell */
 .cell {
-  border: 1px solid red;
+  /* border: 1px solid red; */
   background-repeat: no-repeat;
   background-size: 100%;
 }

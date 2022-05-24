@@ -16,6 +16,192 @@ pacMan: 9,
 // ================================================ \\
 
 // ================================================ \\
+// the game \\
+
+const game = {
+  hasStarted: false,  // !might go unused
+  intervalIds: [],
+  highScore: 0,
+  score: 0,
+  wave: 0,
+  pillsLeft: { pellets: 0, powerUps: 0 },
+  width: playground[0].length,
+  height: playground.length,
+  playgroundElement: document.getElementById(`playground`),
+  phMatrix: playground.flat(),
+  phContainer: document.querySelector(`.physical.plane`),
+  phCells: [],
+  spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1), // !find a way to not use this
+  spContainer: document.querySelector(`.spirits.plane`),
+  spCells: [],
+
+
+  refresh() {
+    pacman.move();
+    ghosts.forEach(ghost => { ghost.move() });
+
+    this.countPills();
+    // TODO check if ghost is eatable if so update score and sendHome else lose
+    const isLost = ghosts.some(ghost => ghost.position === pacman.position);  // TODO replace with detectEncounter()
+
+    if (isLost) {
+      this.lose();
+    }
+    if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
+      this.win();
+    }
+
+    this.renderPh();
+    this.renderSp();
+    this.updateScore(); //TODO
+  },
+
+  start() {
+    this.buildCells();
+    this.renderWalls();
+    this.renderPh();
+    this.renderSp();
+
+    // setTimeout to allow the intro to play
+    setTimeout(() => {
+
+      const refreshIntervalId = setInterval(() => {
+        game.refresh();
+      }, 200);
+      // !when wave % 5 === 0 scatter
+      const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
+
+      this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
+
+      listenForInput();
+
+    }, 3000);
+
+  },
+
+  end() {
+    // TODO
+  },
+
+  win() {
+    // TODO
+  },
+
+  lose() {
+    // TODO
+  },
+
+  renderSp() {
+    ghosts.forEach(ghost => {
+      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
+      if (ghost.previousPosition >= 0) {
+        this.spCells[ghost.previousPosition].className = `cell ghost`;
+      }
+    });
+  },
+
+  renderPh() {
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      switch (this.phMatrix[i]) {
+        case 1:
+        case 4:
+          this.phCells[i].className = `cell`;
+          break;
+        case 2:
+          this.phCells[i].className = `cell pellet`;
+          break;
+        case 3:
+          this.phCells[i].className = `cell power-up`;
+          break;
+        case 9:
+          this.phCells[i].className = `cell ${pacman.getClasses()}`;
+          break;
+      }
+    }
+  },
+  // *checked
+  renderWalls() {
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      if (this.phMatrix[i] === 0) {
+        this.phCells[i].className = `cell wall`;
+      }
+    }
+  },
+
+  buildCells() {
+    this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
+    this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
+
+    for (let i = 0; i < this.phMatrix.length; i++) {
+      const phCell = document.createElement(`div`);
+      const spCell = document.createElement(`div`);
+
+      phCell.className = `cell`;
+      spCell.className = `cell ghost`;
+
+      // phCell.textContent = i.toString();
+      // spCell.textContent = i.toString();
+
+
+      this.phCells.push(phCell);
+      this.phContainer.appendChild(phCell);
+      this.spCells.push(spCell);
+      this.spContainer.appendChild(spCell);
+    }
+  },
+
+  countPills() {
+    let newPelletCount = 0,
+      newPowerUpCount = 0;
+
+    this.phMatrix.forEach(cell => {
+      if (cell === 2) {
+        newPelletCount++;
+      }
+      if (cell === 3) {
+        newPowerUpCount++;
+      }
+    });
+
+    if (this.pillsLeft.pellets > newPelletCount) {
+      this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
+      this.pillsLeft.pellets = newPelletCount;
+      // TODO play appropriate sound
+    }
+    if (this.pillsLeft.powerUps > newPowerUpCount) {
+      this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
+      this.pillsLeft.powerUps = newPowerUpCount;
+
+      ghosts.forEach(ghost => { ghost.makeEatable() });
+      // TODO play appropriate sound
+    }
+  },
+  // TODO it takes points and adds them to the score updates the high score and displays them
+  // TODO it displays +reward next to the score when a ghost is eaten
+  updateScore() {
+
+  },
+
+  detectEncounter() {
+    ghosts.forEach(ghost => {
+      if (ghost.position !== pacman.position) {
+        return;
+      }
+
+      if (!ghost.isEatable && !isEaten) {
+        this.lose();
+      } else {
+        ghost.getEaten();
+      }
+    });
+  }
+}
+
+
+
+// ================================================ \\
+
+// ================================================ \\
 // player \\
 class Player {
   constructor(game, name, direction, classes) {
@@ -57,7 +243,7 @@ class Player {
         this.position -= this.game.width;
         break;
       case `down`:
-        this.position + this.game.width;
+        this.position += this.game.width;
         break;
       case `left`:
         if (this.position % this.game.width === 0) {
@@ -84,7 +270,7 @@ class Player {
 class PacMan extends Player {
   constructor(game, name = `Pac-Man`, direction = `right`, classes = `pacman`, numberInGame = 9) {
     super(game, name, direction, classes);
-    this.position = game.indexOf(numberInGame);
+    this.position = game.phMatrix.indexOf(numberInGame);
   }
 
   // * move is the only access point from game obj
@@ -99,7 +285,7 @@ class PacMan extends Player {
   }
 }
 
-const pacman = new Pacman();
+const pacman = new PacMan(game);
 
 // ================================================ \\
 
@@ -112,7 +298,7 @@ class Ghost extends Player {
     this.isHome = isHome;
     this.homePosition = homePosition;
     this.scatterPosition = scatterPosition;
-    this.position = this.position;
+    this.position = position;
     this.previousPosition = -1;
     this.targetPosition = scatterPosition;
     this.isEatable = false;
@@ -276,189 +462,7 @@ class Ghost extends Player {
 //   new Clyde()
 // ];
 
-// ================================================ \\
-
-// ================================================ \\
-// the game \\
-
-const game = {
-  hasStarted: false,  // !might go unused
-  intervalIds: [],
-  highScore: 0,
-  score: 0,
-  wave: 0,
-  pillsLeft: { pellets: 0, powerUps: 0 },
-  width: playground[0].length,
-  height: playground.length,
-  playgroundElement: document.getElementById(`playground`),
-  phMatrix: playground.flat(),
-  phContainer: document.querySelector(`.physical.plane`),
-  phCells: [],
-  spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1), // !find a way to not use this
-  spContainer: document.querySelector(`.spirits.plane`),
-  spCells: [],
-
-
-  refresh() {
-    pacman.move();
-    ghosts.forEach(ghost => { ghost.move() });
-
-    this.countPills();
-    // TODO check if ghost is eatable if so update score and sendHome else lose
-    const isLost = ghosts.some(ghost => ghost.position === pacman.position);  // TODO replace with detectEncounter()
-
-    if (isLost) {
-      this.lose();
-    }
-    if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
-      this.win();
-    }
-
-    this.renderPh();
-    this.renderSp();
-    this.updateScore(); //TODO
-  },
-
-  start() {
-    this.buildCells();
-    this.renderWalls();
-    this.renderPh();
-    this.renderSp();
-
-    // setTimeout to allow the intro to play
-    // setTimeout(() => {
-
-    //   const refreshIntervalId = setInterval(() => {
-    //     game.refresh();
-    //   }, 20);
-    //   // !when wave % 5 === 0 scatter
-    //   const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
-
-    //   this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
-
-    //   listenForInput();
-
-    // }, 3000);
-
-  },
-
-  end() {
-    // TODO
-  },
-
-  win() {
-    // TODO
-  },
-
-  lose() {
-    // TODO
-  },
-
-  renderSp() {
-    ghosts.forEach(ghost => {
-      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
-      this.spCells[ghost.previousPosition].className = `cell ghost`;
-    });
-  },
-
-  renderPh() {
-    for (let i = 0; i < this.phMatrix.length; i++) {
-      switch (this.phMatrix[i]) {
-        case 1:
-        case 4:
-          this.phCells[i].className = `cell`;
-          break;
-        case 2:
-          this.phCells[i].className = `cell pellet`;
-          break;
-        case 3:
-          this.phCells[i].className = `cell power-up`;
-          break;
-        case 9:
-          this.phCells[i].className = `cell ${pacman.getClasses()}`;
-          break;
-      }
-    }
-  },
-  // *checked
-  renderWalls() {
-    for (let i = 0; i < this.phMatrix.length; i++) {
-      if (this.phMatrix[i] === 0) {
-        this.phCells[i].className = `cell wall`;
-      }
-    }
-  },
-
-  buildCells() {
-    this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
-    this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
-
-    for (let i = 0; i < this.phMatrix.length; i++) {
-      const phCell = document.createElement(`div`);
-      const spCell = document.createElement(`div`);
-
-      phCell.className = `cell`;
-      spCell.className = `cell ghost`;
-
-      phCell.textContent = i.toString();
-      spCell.textContent = i.toString();
-
-
-      this.phCells.push(phCell);
-      this.phContainer.appendChild(phCell);
-      this.spCells.push(spCell);
-      this.spContainer.appendChild(spCell);
-    }
-  },
-
-  countPills() {
-    let newPelletCount = 0,
-      newPowerUpCount = 0;
-
-    this.phMatrix.forEach(cell => {
-      if (cell === 2) {
-        newPelletCount++;
-      }
-      if (cell === 3) {
-        newPowerUpCount++;
-      }
-    });
-
-    if (this.pillsLeft.pellets > newPelletCount) {
-      this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
-      this.pillsLeft.pellets = newPelletCount;
-      // TODO play appropriate sound
-    }
-    if (this.pillsLeft.powerUps > newPowerUpCount) {
-      this.score((this.pillsLeft.powerUps - newPowerUpCount) * 50);
-      this.pillsLeft.powerUps = newPowerUpCount;
-
-      ghosts.forEach(ghost => { ghost.makeEatable() });
-      // TODO play appropriate sound
-    }
-  },
-  // TODO it takes points and adds them to the score updates the high score and displays them
-  // TODO it displays +reward next to the score when a ghost is eaten
-  updateScore() {
-
-  },
-
-  detectEncounter() {
-    ghosts.forEach(ghost => {
-      if (ghost.position !== pacman.position) {
-        return;
-      }
-
-      if (!ghost.isEatable && !isEaten) {
-        this.lose();
-      } else {
-        ghost.getEaten();
-      }
-    });
-  }
-}
-
-
+const ghosts = [new Ghost(game, `Blinky`, `left`, `blinky`, isHome = false, 199, 0, 157, 200)];
 
 // ================================================ \\
 
@@ -534,4 +538,3 @@ function listenForInput() {
 // game.renderPh();
 
 game.start();
-console.log(game.width, game.height);
