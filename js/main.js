@@ -20,11 +20,12 @@ pacMan: 9,
 
 const game = {
   hasStarted: false,  // !might go unused
+  isOnMute: false,
   intervalIds: [],
   highScore: 0,
   highScoreElement: document.querySelector(`.high.score span`),
   score: 0,
-  counter: 0, // !find a better name or solution for slowing eatable ghosts
+  refreshCounter: 0, 
   scoreElement: document.querySelector(`.player.score span`),
   wave: 0,
   pillsLeft: { pellets: 179, powerUps: 4 },
@@ -43,18 +44,46 @@ const game = {
     pacman.move();
     ghosts.forEach(ghost => { ghost.move() });
 
-    this.countPills();
-    // TODO check if ghost is eatable if so update score and sendHome else lose
-    this.detectEncounter();
-    
+    const newPillsCount = this.countPills();
+
+    if (newPillsCount.pellets < this.pillsLeft.pellets) {
+      this.updateScore((this.pillsLeft.pellets - newPillsCount.pellets) * 10);
+      this.pillsLeft.pellets = newPillsCount.pellets;
+      // TODO play appropriate sound
+    }
+    if (newPillsCount.powerUps < this.pillsLeft.powerUps) {
+      this.updateScore((this.pillsLeft.powerUps - newPillsCount.powerUps) * 50);
+      this.pillsLeft.powerUps = newPillsCount.powerUps;
+      // TODO play appropriate sound
+
+      ghosts.forEach(ghost => { ghost.makeEatable() });
+      // TODO play appropriate sound
+    }
+
     if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
       this.win();
+      return;
     }
+
+    // encounter = an array of ghosts in the same position as pacman who are not eaten
+    const encounters = this.detectEncounter();
+
+    if (encounters.length) {
+      for (let ghost of encounters) {
+        if (ghost.isEatable) {
+          ghost.getEaten();
+        } else {
+          this.lose();
+          return;
+        }
+      }
+    }
+    
 
     this.renderPh();
     this.renderSp();
 
-    this.counter > 10 ? this.counter = 0 : this.counter++;
+    this.refreshCounter > 10 ? this.refreshCounter = 0 : this.refreshCounter++;
   },
 
   start() {
@@ -81,7 +110,6 @@ const game = {
   },
 
   end() {
-    // TODO
     this.intervalIds.forEach(id => { clearInterval(id) });
   },
 
@@ -91,7 +119,11 @@ const game = {
 
   lose() {
     // TODO
-    console.log(`lost`);
+    this.end();
+    pacman.die();
+
+    // TODO: update then show pop up
+
   },
   // *checked
   renderSp() {
@@ -165,24 +197,10 @@ const game = {
           break;
         case 3:
           newPowerUpCount++;
-          break;
       }
     });
 
-    if (this.pillsLeft.pellets > newPelletCount) {
-      this.updateScore((this.pillsLeft.pellets - newPelletCount) * 10);
-
-      this.pillsLeft.pellets = newPelletCount;
-      // TODO play appropriate sound
-    }
-    if (this.pillsLeft.powerUps > newPowerUpCount) {
-      this.updateScore((this.pillsLeft.powerUps - newPowerUpCount) * 50);
-
-      this.pillsLeft.powerUps = newPowerUpCount;
-
-      ghosts.forEach(ghost => { ghost.makeEatable() });
-      // TODO play appropriate sound
-    }
+    return { pellets: newPelletCount, powerUps: newPowerUpCount };
   },
   // *checked
   updateScore(points) {
@@ -196,18 +214,19 @@ const game = {
     }
   },
   // *checked
+  // returns an array
   detectEncounter() {
+    const encounters = [];
+
     for (let ghost of ghosts) {
-      if (ghost.position !== pacman.position) {
+      if (ghost.position !== pacman.position || ghost.isEaten) {
         continue;
       }
 
-      if (!ghost.isEatable && !ghost.isEaten) {
-        this.lose();
-      } else {
-        ghost.getEaten();
-      }
+      encounters.push(ghost);
     }
+    
+    return encounters;
   }
 }
 
@@ -238,8 +257,8 @@ class Player {
       case `up`:
         return this.game.phMatrix[this.position - this.game.width] !== 0;
       case `down`:  // going inside the ghost home is not allowed
-      // TODO dry this one
-        return this.game.phMatrix[this.position] === 4 ? false : this.game.phMatrix[this.position + this.game.width] !== 0;
+        // TODO dry this one
+        return this.position === 157 ? false : this.game.phMatrix[this.position + this.game.width] !== 0;
       case `left`:
         if (this.position % this.game.width === 0) {
           return this.game.phMatrix[this.position + (this.game.width - 1)] !== 0;
@@ -292,6 +311,10 @@ class PacMan extends Player {
 
       this.game.phMatrix[this.position] = 9;
     }
+  }
+
+  die () {
+    // TODO
   }
 }
 
@@ -459,7 +482,7 @@ class Ghost extends Player {
     } else if (this.isEaten) {
       return `eaten ${this.direction}`;
     } else {
-      return `${this.classes} ${this.direction}`;
+      return super.getClasses();
     }
   }
 }
