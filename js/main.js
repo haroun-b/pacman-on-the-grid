@@ -16,16 +16,28 @@ pacMan: 9,
 // ================================================ \\
 
 // ================================================ \\
+// buttons
+
+const interface = {
+  startBtn: document.getElementById(`start-game`),
+  // mute: ,
+  controls: document.getElementById(`controls`),
+  popup: document.getElementById(`popup`),
+}
+
+// ================================================ \\
+
+// ================================================ \\
 // the game \\
 
 const game = {
-  hasStarted: false,  // !might go unused
+  playgroundIsBuilt: false,
   isOnMute: false,
   intervalIds: [],
   highScore: 0,
   highScoreElement: document.querySelector(`.high.score span`),
   score: 0,
-  refreshCounter: 0, 
+  refreshCounter: 0,
   scoreElement: document.querySelector(`.player.score span`),
   wave: 0,
   pillsLeft: { pellets: 179, powerUps: 4 },
@@ -60,14 +72,10 @@ const game = {
       // TODO play appropriate sound
     }
 
-    if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
-      this.win();
-      return;
-    }
-
+    
     // encounter = an array of ghosts in the same position as pacman who are not eaten
     const encounters = this.detectEncounter();
-
+    
     if (encounters.length) {
       for (let ghost of encounters) {
         if (ghost.isEatable) {
@@ -79,16 +87,34 @@ const game = {
       }
     }
     
-
     this.renderPh();
     this.renderSp();
+
+    if (this.pillsLeft.pellets === 0 && this.pillsLeft.powerUps === 0) {
+      this.win();
+      return;
+    }
 
     this.refreshCounter > 10 ? this.refreshCounter = 0 : this.refreshCounter++;
   },
 
   start() {
-    this.buildCells();
-    this.renderWalls();
+    this.phMatrix = playground.flat();
+    this.pillsLeft = this.countPills();
+    this.refreshCounter = 0;
+    this.wave = 0;
+    this.score = 0;
+    this.updateScore(0);
+    
+    this.playgroundElement.classList.remove(`won`);
+
+    if (!this.playgroundIsBuilt) {
+      this.buildCells();
+      this.renderWalls();
+
+      this.playgroundIsBuilt = true;
+    }
+
     this.renderPh();
     this.renderSp();
 
@@ -113,17 +139,68 @@ const game = {
     this.intervalIds.forEach(id => { clearInterval(id) });
   },
 
+  renderPopup(state) {
+    if (state === `hidden`) {
+      interface.popup.style = null;
+      return;
+    }
+
+    let delay = 1700;
+
+    const PopupHeading = interface.popup.querySelector(`h2`),
+      instructions = interface.popup.querySelectorAll(`p, img`);
+
+    const scoreP = document.createElement(`p`),
+      msgP = document.createElement(`p`);
+
+    for (let element of instructions) {
+      element.remove();
+    }
+
+    scoreP.textContent = this.score === this.highScore ? `NEW HIGH SCORE: ${this.highScore}` : `YOU SCORED: ${this.score}`;
+
+    if (state === `lost`) {
+      PopupHeading.textContent = `YOU LOST`;
+      PopupHeading.className = `lost`
+
+      msgP.textContent = `Oh, Oh! It seems you lost this one.
+      To play again, press the start button.`
+    }
+    if (state === `won`) {
+      delay = 1000;
+      PopupHeading.textContent = `YOU WON!`;
+      PopupHeading.className = `won`
+
+      msgP.textContent = `Woah! You defeated the ghosts. Congratulations!
+      To play again, press the start button.`
+    }
+  
+
+    interface.popup.insertBefore(scoreP, interface.startBtn);
+    interface.popup.insertBefore(msgP, interface.startBtn);
+    
+    setTimeout(() => {
+      interface.popup.style.display = `flex`;
+    }, delay);
+  },
+
+  renderDayingPacman() {
+    setTimeout(() => {
+      this.phCells[pacman.position].className = `cell d-pacman`;
+    }, 300);
+  },
+
   win() {
-    // TODO
+    this.end();
+    this.playgroundElement.classList.add(`won`);
+    this.renderPopup(`won`);
   },
 
   lose() {
-    // TODO
     this.end();
-    pacman.die();
-
-    // TODO: update then show pop up
-
+    pacman.die(); //!might go unused
+    this.renderDayingPacman();
+    this.renderPopup(`lost`);
   },
   // *checked
   renderSp() {
@@ -225,7 +302,7 @@ const game = {
 
       encounters.push(ghost);
     }
-    
+
     return encounters;
   }
 }
@@ -298,23 +375,29 @@ class Player {
 class PacMan extends Player {
   constructor(game, name = `Pac-Man`, direction = `right`, classes = `pacman`, numberInGame = 9) {
     super(game, name, direction, classes);
+    this.numberInGame = numberInGame;
     this.position = game.phMatrix.indexOf(numberInGame);
+    this.isDead = false;
   }
 
   // * move is the only access point from game obj
   move() {
-    console.log(this.position, this.direction);
+    // console.log(this.position, this.direction);
     if (this.canMove()) {
       this.game.phMatrix[this.position] = 1;
 
       super.move();
 
-      this.game.phMatrix[this.position] = 9;
+      this.game.phMatrix[this.position] = this.numberInGame;
     }
   }
-
-  die () {
+// !might go unused
+  die() {
     // TODO
+    this.isDead = true;
+  }
+  reset() {
+    this.position = game.phMatrix.indexOf(numberInGame);
   }
 }
 
@@ -435,7 +518,7 @@ class Ghost extends Player {
     const absYDistance = Math.abs(yDistance),
       absXDistance = Math.abs(xDistance);
 
-    console.log(clearPaths);  // TODO: remove this line
+    // console.log(clearPaths);  // TODO: remove this line
 
     this.direction = clearPaths.find((path, index) => {
       if (index === clearPaths.length - 1) {
@@ -516,7 +599,7 @@ document.addEventListener(`keydown`, e => {
 
 // ================================================ \\
 // starts the game \\
-document.getElementById(`start-game`).addEventListener(`click`, e => {
+interface.startBtn.addEventListener(`click`, e => {
   game.start();
 });
 
@@ -542,7 +625,7 @@ function listenForInput() {
   });
 
   // changes pacman's direction based on screen control input \\
-  document.getElementById(`controls`).addEventListener(`click`, e => {
+  interface.controls.addEventListener(`click`, e => {
     const targetClass = e.target.className;
 
     switch (targetClass) {
@@ -571,7 +654,7 @@ function listenForInput() {
 // game.renderWalls();
 // game.renderPh();
 
-game.start();
+// game.start();
 
 document.addEventListener(`keydown`, e => {
   switch (e.code) {
