@@ -445,39 +445,36 @@ class Ghost extends Player {
   }
   //*checked
   isHome() {
-  
-    return this.position === this.homePosition;
+    return this.position > 197 && this.position < 201;  // *find a better solution
   }
   // except for blinky
   reset() {
     this.position = this.homePosition;
   }
-
-  // TODO mutate getHuntPosition for all the different ghosts other than blinky
-  getHuntPosition() {  //! ghost specific
+  getHuntPosition() {
     return this.pacman.position;
   }
 
   move() {
+    // * move is the only access point from game obj
     if (this.isEatable && this.game.refreshCounter % 2 === 0) {
       return;
     }
-    // * move is the only access point from game obj
-    this.changeDirection();
 
+    this.changeDirection();
+    
     this.previousPosition = this.position;
     super.move();
-
   }
 
   canMove(direction = this.direction) {
     // eaten ghosts can move through walls
-    // !problem here
-
+    // !problem might be here
+    
     return this.isEaten ? true : super.canMove(direction);
   }
 
-  getDirectionOfPrevious() {
+  getPathToPrevious() {
     const upIsPrevious = this.position - this.game.width === this.previousPosition,
       downIsPrevious = this.position + this.game.width === this.previousPosition,
       leftIsPrevious = this.position % this.game.width === 0 ? this.position + (this.game.width - 1) === this.previousPosition : this.position - 1 === this.previousPosition,
@@ -502,6 +499,7 @@ class Ghost extends Player {
       if (this.isEaten) {
         this.isEaten = false;
       }
+
       this.targetPosition = this.homeEntrance;
       return;
     }
@@ -535,22 +533,27 @@ class Ghost extends Player {
     let clearPaths = this.getClearPaths();
 
     // *direction is only changed at intersections. ie 3 or more clearPaths
-    if (clearPaths.length < 3 && this.canMove(this.direction)) {
+    if (clearPaths.length < 3 && this.canMove()) {
       return;
     }
+    console.log(clearPaths, this.canMove(), this.getTargetPosition(), this);
 
     // *so targetPosition can be changed to previous position when there's a state change
     this.getTargetPosition();
 
-    const yDistance = Math.floor(this.position / this.game.width) - Math.floor(this.targetPosition / this.game.width),
-      xDistance = this.position % this.game.width - this.targetPosition % this.game.width,
-      targetIsPrevious = this.previousPosition === this.targetPosition;
+    const targetIsPrevious = this.previousPosition === this.targetPosition,
+      pathToPrevious = this.getPathToPrevious();
 
-    if (!targetIsPrevious) {
-      clearPaths = clearPaths.filter(path => path !== this.getDirectionOfPrevious());
+    if (targetIsPrevious) {
+      this.direction = pathToPrevious;
+      return;
     }
 
-    const absYDistance = Math.abs(yDistance),
+    clearPaths = clearPaths.filter(path => path !== pathToPrevious);
+
+    const yDistance = Math.floor(this.position / this.game.width) - Math.floor(this.targetPosition / this.game.width),
+      xDistance = this.position % this.game.width - this.targetPosition % this.game.width,
+      absYDistance = Math.abs(yDistance),
       absXDistance = Math.abs(xDistance);
 
     // console.log(clearPaths);  // TODO: remove this line
@@ -671,14 +674,10 @@ class Inky extends Ghost {
 
     return this.blinky.position - (this.game.width * yDistance * 2) - (xDistance * 2);
   }
-  canMove() {
-    return this.isHome() && this.game.score < 300 ? false : super.canMove();
-  }
   move() {
-    if (!this.canMove()) {
+    if (this.isHome() && this.game.score < 300) {
       return;
     }
-    console.log(this.game.score);
 
     super.move();
   }
@@ -694,7 +693,7 @@ class Clyde extends Ghost {
       absXDistance = Math.abs(this.position % this.game.width - this.pacman.position % this.game.width),
       targetPosition = super.getTargetPosition();
 
-    if (absXDistance >= 8 || absYDistance >= 8) {
+    if (absXDistance <= 8 || absYDistance <= 8) {
       if (targetPosition === this.pacman.position) {
         return this.scatterPosition;
       }
@@ -702,13 +701,11 @@ class Clyde extends Ghost {
 
     return targetPosition;
   }
-  canMove() {
-    return this.isHome() && this.game.score < 800 ? false : super.canMove();
-  }
   move() {
-    if (!this.canMove()) {
+    if (this.isHome() && this.game.score < 800) {
       return;
     }
+
     super.move();
   }
 }
