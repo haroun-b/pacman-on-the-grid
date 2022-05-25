@@ -306,7 +306,7 @@ const game = {
         && ghost.previousPosition !== pacman.position
         && pacman.previousPosition !== ghost.position
         || ghost.isEaten
-        ) {
+      ) {
         continue;
       }
 
@@ -402,7 +402,7 @@ class PacMan extends Player {
     if (this.canMove()) {
       this.game.phMatrix[this.position] = 1;
       this.previousPosition = this.position;
-      
+
       super.move();
 
       this.game.phMatrix[this.position] = this.numberInGame;
@@ -413,7 +413,7 @@ class PacMan extends Player {
     // TODO
     console.log(`pacmandie`)
     this.isDead = true;
-    if(killerGhost.previousPosition === this.position) {
+    if (killerGhost.previousPosition === this.position) {
       this.position = this.previousPosition;
     }
   }
@@ -588,10 +588,10 @@ class Ghost extends Player {
     this.isEatable = true;
     this.targetPosition = this.previousPosition;
 
-    if(this.eatableTimeoutId > 0) {
+    if (this.eatableTimeoutId > 0) {
       clearTimeout(this.eatableTimeoutId);
     }
-    
+
     this.eatableTimeoutId = setTimeout(() => {
       this.isEatable = false;
       this.targetPosition = this.previousPosition;
@@ -617,13 +617,33 @@ class Blinky extends Ghost {
   }
 
   reset() {
-this.position = this.initialPosition;
+    this.position = this.initialPosition;
   }
 }
 
 class Pinky extends Ghost {
-  
+  constructor({ game, pacman }) {
+    super({ game, name: `Pinky`, direction: `up`, classes: `pinky`, homePosition: 199, scatterPosition: 0, reward: 400, pacman });
+  }
+
+  getHuntPosition() {
+    switch (this.pacman.direction) {
+      case `up`:
+        return this.pacman.position - (this.game.width * 4);
+      case `down`:
+        return this.pacman.position + (this.game.width * 4);
+      case `left`:
+        return this.pacman.position % this.game.width === 0 ? (this.pacman.position + this.game.width - 4) : (this.pacman.position - 4);
+      case `right`:
+        return (this.pacman.position + 1) % this.game.width === 0 ? this.pacman.position - (this.game.width - 4) : (this.pacman.position - 4);
+    }
+  }
+  canMove() {
+    return this.isHome() && this.game.score < 300 ? false : super.canMove();
+  }
 }
+
+
 
 // TODO uncomment
 // const ghosts = [
@@ -634,7 +654,7 @@ class Pinky extends Ghost {
 // ];
 
 
-const ghosts = [new Ghost({game, name: `Blinky`, direction: `left`, classes: `blinky`, homePosition: 199, scatterPosition: 0, position: 157, reward: 200, pacman})];
+const ghosts = [new Ghost({ game, name: `Blinky`, direction: `left`, classes: `blinky`, homePosition: 199, scatterPosition: 0, position: 157, reward: 200, pacman })];
 
 // ================================================ \\
 
