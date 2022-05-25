@@ -638,12 +638,41 @@ class Pinky extends Ghost {
         return (this.pacman.position + 1) % this.game.width === 0 ? this.pacman.position - (this.game.width - 4) : (this.pacman.position - 4);
     }
   }
+}
+
+class Inky extends Ghost {
+  constructor({ game, pacman, blinky = blinky }) {
+    super({ game, name: `Inky`, direction: `up`, classes: `inky`, homePosition: 198, scatterPosition: this.game.phMatrix.length - 1, reward: 800, pacman });
+    this.blinky = blinky;
+  }
+
+  getHuntPosition() {
+    let twoAheadOfPacman;
+
+    switch (this.pacman.direction) {
+      case `up`:
+        twoAheadOfPacman = this.pacman.position - (this.game.width * 2);
+        break;
+      case `down`:
+        twoAheadOfPacman = this.pacman.position + (this.game.width * 2);
+        break;
+      case `left`:
+        twoAheadOfPacman = this.pacman.position % this.game.width === 0 ? (this.pacman.position + this.game.width - 2) : (this.pacman.position - 2);
+        break;
+      case `right`:
+        twoAheadOfPacman = (this.pacman.position + 1) % this.game.width === 0 ? this.pacman.position - (this.game.width - 2) : (this.pacman.position - 2);
+        break;
+    }
+
+    const yDistance = Math.floor(this.blinky.position / this.game.width) - Math.floor(twoAheadOfPacman / this.game.width),
+      xDistance = this.blinky.position % this.game.width - twoAheadOfPacman % this.game.width;
+
+    return this.blinky.position - (this.game.width * yDistance * 2) - (xDistance * 2);
+  }
   canMove() {
     return this.isHome() && this.game.score < 300 ? false : super.canMove();
   }
 }
-
-
 
 // TODO uncomment
 // const ghosts = [
