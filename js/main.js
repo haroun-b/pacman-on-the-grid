@@ -72,21 +72,22 @@ const game = {
       // TODO play appropriate sound
     }
 
-    
+
     // encounter = an array of ghosts in the same position as pacman who are not eaten
     const encounters = this.detectEncounter();
-    
+
     if (encounters.length) {
       for (let ghost of encounters) {
         if (ghost.isEatable) {
           ghost.getEaten();
         } else {
-          this.lose();
+          this.lose(ghost);
+          this.renderPh();
           return;
         }
       }
     }
-    
+
     this.renderPh();
     this.renderSp();
 
@@ -99,13 +100,17 @@ const game = {
   },
 
   start() {
+    this.renderPopup(`hidden`);
+
     this.phMatrix = playground.flat();
     this.pillsLeft = this.countPills();
     this.refreshCounter = 0;
     this.wave = 0;
     this.score = 0;
     this.updateScore(0);
-    
+    pacman.reset();
+    ghosts.forEach(ghost => { ghost.reset() });
+
     this.playgroundElement.classList.remove(`won`);
 
     if (!this.playgroundIsBuilt) {
@@ -141,7 +146,7 @@ const game = {
 
   renderPopup(state) {
     if (state === `hidden`) {
-      interface.popup.style = null;
+      interface.popup.style.display = `none`;
       return;
     }
 
@@ -174,13 +179,13 @@ const game = {
       msgP.textContent = `Woah! You defeated the ghosts. Congratulations!
       To play again, press the start button.`
     }
-  
+
 
     interface.popup.insertBefore(scoreP, interface.startBtn);
     interface.popup.insertBefore(msgP, interface.startBtn);
-    
+
     setTimeout(() => {
-      interface.popup.style.display = `flex`;
+      interface.popup.style = null;
     }, delay);
   },
 
@@ -196,10 +201,10 @@ const game = {
     this.renderPopup(`won`);
   },
 
-  lose() {
+  lose(killerGhost) {
     this.end();
-    pacman.die(); //!might go unused
-    this.renderDayingPacman();
+    pacman.die(killerGhost); //!might go unused
+    // this.renderDayingPacman();
     this.renderPopup(`lost`);
   },
   // *checked
@@ -252,8 +257,8 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      // phCell.textContent = i.toString(); // TODO: delete this line
-      // spCell.textContent = i.toString(); // TODO: delete this line
+      phCell.textContent = i.toString(); // TODO: delete this line
+      spCell.textContent = i.toString(); // TODO: delete this line
 
 
       this.phCells.push(phCell);
@@ -296,7 +301,12 @@ const game = {
     const encounters = [];
 
     for (let ghost of ghosts) {
-      if (ghost.position !== pacman.position || ghost.isEaten) {
+      if (
+        ghost.position !== pacman.position
+        && ghost.previousPosition !== pacman.position
+        && pacman.previousPosition !== ghost.position
+        || ghost.isEaten
+        ) {
         continue;
       }
 
@@ -314,7 +324,7 @@ const game = {
 // ================================================ \\
 // player \\
 class Player {
-  constructor(game, name, direction, classes) {
+  constructor({ game, name, direction, classes }) {
     this.game = game;
     this.name = name;
     this.direction = direction;
@@ -373,11 +383,17 @@ class Player {
 // ================================================ \\
 // pacman \\
 class PacMan extends Player {
-  constructor(game, name = `Pac-Man`, direction = `right`, classes = `pacman`, numberInGame = 9) {
-    super(game, name, direction, classes);
+  constructor({ game, name = `Pac-Man`, direction = `right`, classes = `pacman`, numberInGame = 9 }) {
+    super({ game, name, direction, classes });
     this.numberInGame = numberInGame;
     this.position = game.phMatrix.indexOf(numberInGame);
+    this.previousPosition = -1;
     this.isDead = false;
+  }
+
+  getClasses() {
+    console.log(`getpacmanclasses`)
+    return this.isDead ? `d-pacman` : super.getClasses();
   }
 
   // * move is the only access point from game obj
@@ -385,42 +401,57 @@ class PacMan extends Player {
     // console.log(this.position, this.direction);
     if (this.canMove()) {
       this.game.phMatrix[this.position] = 1;
-
+      this.previousPosition = this.position;
+      
       super.move();
 
       this.game.phMatrix[this.position] = this.numberInGame;
     }
   }
-// !might go unused
-  die() {
+  // !might go unused
+  die(killerGhost) {
     // TODO
+    console.log(`pacmandie`)
     this.isDead = true;
+    if(killerGhost.previousPosition === this.position) {
+      this.position = this.previousPosition;
+    }
   }
   reset() {
-    this.position = game.phMatrix.indexOf(numberInGame);
+    this.position = game.phMatrix.indexOf(this.numberInGame);
+    this.direction = `right`;
+    this.isDead = false;
   }
 }
 
-const pacman = new PacMan(game);
+const pacman = new PacMan({ game: game });
 
 // ================================================ \\
 
 // ================================================ \\
 // the ghosts \\
 class Ghost extends Player {
-  constructor(game, name, direction, classes, isHome = true, homePosition, scatterPosition, position, reward, pacman) {
-    super(game, name, direction, classes);
-    this.homeEntrance = game.phMatrix.indexOf(4);
-    this.isHome = isHome;
-    this.homePosition = homePosition;
+  constructor({ game = game, name, direction, classes, homePosition, scatterPosition, position, reward, pacman = pacman }) {
+    super({ game, name, direction, classes });
     this.scatterPosition = scatterPosition;
-    this.position = position;
+    this.homeEntrance = game.phMatrix.indexOf(4);
+    this.homePosition = homePosition;
+    this.position = position === undefined ? homePosition : position;
     this.previousPosition = -1;
     this.targetPosition = scatterPosition;
     this.isEatable = false;
+    this.eatableTimeoutId = -1;
     this.isEaten = false;
     this.reward = reward;
     this.pacman = pacman;
+  }
+  //*checked
+  isHome() {
+    return this.position === this.homePosition;
+  }
+  // except for blinky
+  reset() {
+    this.position = this.homePosition;
   }
 
   // TODO mutate getHuntPosition for all the different ghosts other than blinky
@@ -429,7 +460,7 @@ class Ghost extends Player {
   }
 
   move() {
-    if (this.isEatable && this.game.counter % 2 === 0) {
+    if (this.isEatable && this.game.refreshCounter % 2 === 0) {
       return;
     }
     // * move is the only access point from game obj
@@ -466,7 +497,10 @@ class Ghost extends Player {
   }
 
   getTargetPosition() {
-    if (isHome) {
+    if (this.isHome()) {
+      if (this.isEaten) {
+        this.isEaten = false;
+      }
       this.targetPosition = this.homeEntrance;
       return;
     }
@@ -546,6 +580,7 @@ class Ghost extends Player {
     this.isEatable = false;
     this.isEaten = true;
 
+    this.targetPosition = this.homePosition;
     this.game.updateScore(this.reward);
   }
 
@@ -553,9 +588,14 @@ class Ghost extends Player {
     this.isEatable = true;
     this.targetPosition = this.previousPosition;
 
-    setTimeout(() => {
+    if(this.eatableTimeoutId > 0) {
+      clearTimeout(this.eatableTimeoutId);
+    }
+    
+    this.eatableTimeoutId = setTimeout(() => {
       this.isEatable = false;
       this.targetPosition = this.previousPosition;
+      this.eatableTimeoutId = -1;
     }, 7000);
   }
 
@@ -570,6 +610,20 @@ class Ghost extends Player {
   }
 }
 
+class Blinky extends Ghost {
+  constructor({ game, position = 157, pacman }) {
+    super({ game, name: `Blinky`, direction: `left`, classes: `blinky`, homePosition: 199, scatterPosition: (game.width - 1), position, reward: 200, pacman });
+    this.initialPosition = position;
+  }
+
+  reset() {
+this.position = this.initialPosition;
+  }
+}
+
+class Pinky extends Ghost {
+  
+}
 
 // TODO uncomment
 // const ghosts = [
@@ -579,7 +633,8 @@ class Ghost extends Player {
 //   new Clyde()
 // ];
 
-const ghosts = [new Ghost(game, `Blinky`, `left`, `blinky`, isHome = false, 199, 0, 157, 200, pacman)];
+
+const ghosts = [new Ghost({game, name: `Blinky`, direction: `left`, classes: `blinky`, homePosition: 199, scatterPosition: 0, position: 157, reward: 200, pacman})];
 
 // ================================================ \\
 

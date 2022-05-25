@@ -3,6 +3,7 @@
 
 /* pacman alive */
 .pacman {
+  z-index: 1;
   animation: pacman 0.2s linear infinite alternate;
 }
 
