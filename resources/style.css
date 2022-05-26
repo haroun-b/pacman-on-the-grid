@@ -203,7 +203,7 @@ background-image: url('./buttons/mute-off.svg');
   padding: calc(var(--point) * 3) calc(var(--point) * 5);
 }
 
-#popup h2 {
+h2 {
   font-size: calc(var(--point) * 5);
   color: #ffbfa4;
 }
