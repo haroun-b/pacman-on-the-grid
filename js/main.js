@@ -20,9 +20,12 @@ pacMan: 9,
 
 const interface = {
   startBtn: document.getElementById(`start-game`),
-  // mute: ,
+  mute: document.querySelector(`.mute`),
   controls: document.getElementById(`controls`),
   popup: document.getElementById(`popup`),
+  audio: {
+    chomp: document.querySelector(`.chomp`),
+  }
 }
 
 // ================================================ \\
@@ -31,25 +34,25 @@ const interface = {
 // the game \\
 
 const game = {
-  playgroundIsBuilt: false,
-  isOnMute: false,
-  intervalIds: [],
-  highScore: 0,
-  highScoreElement: document.querySelector(`.high.score span`),
-  score: 0,
-  refreshCounter: 0,
-  scoreElement: document.querySelector(`.player.score span`),
-  wave: 0,
-  pillsLeft: { pellets: 179, powerUps: 4 },
+  phMatrix: playground.flat(),
   width: playground[0].length,
   height: playground.length,
   playgroundElement: document.getElementById(`playground`),
-  phMatrix: playground.flat(),
+  playgroundIsBuilt: false,
   phContainer: document.querySelector(`.physical.plane`),
   phCells: [],
   spMatrix: playground.flat().map(cell => cell <= 1 ? cell : 1), // !find a way to not use this
   spContainer: document.querySelector(`.spirits.plane`),
   spCells: [],
+  pillsLeft: { pellets: 179, powerUps: 4 },
+  highScore: 0,
+  highScoreElement: document.querySelector(`.high.score span`),
+  score: 0,
+  scoreElement: document.querySelector(`.player.score span`),
+  refreshCounter: 0,
+  wave: 0,
+  intervalIds: [],
+  isOnMute: false,
 
 
   refresh() {
@@ -62,6 +65,8 @@ const game = {
       this.updateScore((this.pillsLeft.pellets - newPillsCount.pellets) * 10);
       this.pillsLeft.pellets = newPillsCount.pellets;
       // TODO play appropriate sound
+      interface.audio.chomp.play();
+      interface.audio.chomp.loop = false;
     }
     if (newPillsCount.powerUps < this.pillsLeft.powerUps) {
       this.updateScore((this.pillsLeft.powerUps - newPillsCount.powerUps) * 50);
@@ -462,7 +467,7 @@ class Ghost extends Player {
     }
 
     this.changeDirection();
-    
+
     this.previousPosition = this.position;
     super.move();
   }
@@ -470,7 +475,7 @@ class Ghost extends Player {
   canMove(direction = this.direction) {
     // eaten ghosts can move through walls
     // !problem might be here
-    
+
     return this.isEaten ? true : super.canMove(direction);
   }
 

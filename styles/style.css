@@ -37,6 +37,15 @@ main {
   height: 2.2rem;
   width: 100%;
 }
+
+/* mute button */
+
+.mute {
+  all: unset;
+  height: 1.3rem;
+  width: 1.3rem;
+  background-color: #fff;
+}
 /* ======================================= */
 
 /* ======================================= */
@@ -172,19 +181,17 @@ main {
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  background-color: #ffbfa4f6;
-  color: #000;
+  background-color: #000000c1;
+  color: rgb(255, 255, 255);
   text-align: center;
   font-size: .75rem;
   padding: .5rem 1.5rem;
 }
 
 [alt='instructions gif'] {
-  background-image: url('/resources/sprites/ghosts/blinky/blinky-down-1.svg');
-  background-repeat: no-repeat;
-  background-size: contain;
   flex-grow: 1;
-  margin: 0 auto;
+  height: 100%;
+  margin: 1rem auto;
 }
 
 #start-game {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="/resources/sprites/pacman/pacman-2.svg" type="image/x-icon" />
     <title>Pac-Man</title>
     <link rel="stylesheet" href="./styles/remedy.css" />
     <link rel="stylesheet" href="./styles/style.css" />
@@ -20,6 +21,8 @@
         </section>
 
         <section id="lives"></section>
+
+        <button class="mute off"></button>
       </section>
 
       <section id="playground">
@@ -45,8 +48,10 @@
         tap the arrow on the screen.
       </p>
       <p>Included below is a helpful little gif. Have Fun!</p>
-      <img src="" alt="instructions gif" />
+      <img src="/resources/instructions.gif" alt="instructions gif" />
       <button id="start-game">Start</button>
     </section>
+
+    <audio class="chomp" src="/resources/sound-effects/pacman_chomp.wav"></audio>
   </body>
 </html>
