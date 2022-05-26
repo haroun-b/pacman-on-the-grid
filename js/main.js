@@ -139,20 +139,13 @@ const game = {
   },
   // returns an array of ghosts
   detectEncounter() {
-    const encounters = [];
-
-    for (let ghost of ghosts) {
-      const isPacmanCollingWithGhost = ghost.position === pacman.position
-        || (ghost.previousPosition === pacman.position
+   return ghosts.filter(ghost => {
+      const isThereCollision = ghost.position === pacman.position
+      || (ghost.previousPosition === pacman.position
           && pacman.previousPosition === ghost.position);
 
-      if (!ghost.isEaten && isPacmanCollingWithGhost) {
-        encounters.push(ghost);
-      }
-
-    }
-
-    return encounters;
+        return !ghost.isEaten && isThereCollision;
+    });
   },
 
   end() {

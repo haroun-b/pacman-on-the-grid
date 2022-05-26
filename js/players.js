@@ -1,6 +1,6 @@
 // ================================================ \\
 // player \\
-class Player {
+class Character {
   constructor({ game, name, direction, classes, startPosition }) {
     this.game = game;
     this.name = name;
@@ -73,7 +73,7 @@ class Player {
 
 // ================================================ \\
 // pacman \\
-class PacMan extends Player {
+class PacMan extends Character {
   constructor({ game, name = `Pac-Man`, direction = `right`, startPosition = 325 }) {
     super({ game, name, direction, classes: `pacman`, startPosition });
     this.isDead = false;
@@ -97,7 +97,7 @@ class PacMan extends Player {
 
 // ================================================ \\
 // the ghosts \\
-class Ghost extends Player {
+class Ghost extends Character {
   constructor({ game, pacman, name, direction, classes, startPosition, scatterPosition, reward }) {
     super({ game, name, direction, classes, startPosition });
     this.homePosition = startPosition;
