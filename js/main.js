@@ -144,7 +144,7 @@ const game = {
     for (let ghost of ghosts) {
       const isPacmanCollingWithGhost = ghost.position === pacman.position
         || (ghost.previousPosition === pacman.position
-          && pacman.previousPosition === ghost.position)
+          && pacman.previousPosition === ghost.position);
 
       if (!ghost.isEaten && isPacmanCollingWithGhost) {
         encounters.push(ghost);

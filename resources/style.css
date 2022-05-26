@@ -2,12 +2,15 @@
 
 /* ======================================= */
 /* global */
+:root {
+  --point: 1vh;
+}
 
 body {
   background-color: #000;
   color: #fff;
   font-family: "Press Start 2P";
-  font-size: 0.65rem;
+  font-size: calc(var(--point) * 1.5);
   width: 100vw;
 }
 
@@ -19,10 +22,10 @@ main {
 main {
   display: flex;
   flex-flow: column nowrap;
-  width: calc(100vh - 2.2rem);
+  width: calc(var(--point) * 100);
   align-items: center;
   justify-content: center;
-  margin: 0 14rem auto;
+  margin: 0 auto;
 }
 /* ======================================= */
 
@@ -34,18 +37,18 @@ main {
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: center;
-  height: 2.2rem;
-  width: 100%;
+  height: calc(var(--point) * 5.5);
+  width: 94%;
 }
 
 /* mute button */
 
 .mute {
   all: unset;
-  height: 1.3rem;
-  width: 1.3rem;
+  height: calc(var(--point) * 4);
+  width: calc(var(--point) * 4);
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 100%;
 }
 .mute.on {
 background-image: url('./buttons/mute-on.svg');
@@ -59,8 +62,8 @@ background-image: url('./buttons/mute-off.svg');
 /* playground */
 
 #playground {
-  width: calc(100vh - 2.25rem);
-  height: calc(100vh - 2.25rem);
+  width: calc(var(--point) * 94.5);
+  height: calc(var(--point) * 94.5);
 
   transition: background-color .4s linear .2s ;
 }
@@ -72,8 +75,8 @@ background-image: url('./buttons/mute-off.svg');
 .plane {
   position: absolute;
   display: grid;
-  width: calc(100vh - 2.25rem);
-  height: calc(100vh - 2.25rem);
+  width: calc(var(--point) * 94.5);
+  height: calc(var(--point) * 94.5);
   gap: 0;
 }
 
@@ -116,8 +119,8 @@ background-image: url('./buttons/mute-off.svg');
 #controls {
   flex-shrink: 1;
   display: grid;
-  width: 14rem;
-  height: 14rem;
+  width: calc(var(--point) * 35);
+  height: calc(var(--point) * 35);
   grid-template-rows: 1fr 0.75fr 1fr;
   grid-template-columns: 1fr 0.75fr 1fr;
   grid-template-areas:
@@ -135,6 +138,11 @@ background-image: url('./buttons/mute-off.svg');
   position: relative;
   background-color: #ffbfa4;
   background-repeat: no-repeat;
+}
+
+.control:hover {
+  background-color: #1e1e87;
+  cursor: pointer;
 }
 
 .control.up,
@@ -191,24 +199,29 @@ background-image: url('./buttons/mute-off.svg');
   background-color: #000000c1;
   color: rgb(255, 255, 255);
   text-align: center;
-  font-size: .75rem;
-  padding: .5rem 1.5rem;
+  font-size: calc(var(--point) * 1.7);
+  padding: calc(var(--point) * 3) calc(var(--point) * 5);
 }
 
 [alt='instructions gif'] {
   flex-grow: 1;
   height: 100%;
-  margin: 1rem auto;
+  margin: calc(var(--point) * 2) auto;
 }
 
 #start-game {
   all: unset;
-  font-size: 4rem;
+  font-size: calc(var(--point) * 5);
   background-color: #1c1c78;
   color: #fff;
   width: fit-content;
-  padding: 1rem 1.5rem;
+  padding: calc(var(--point) * 3) calc(var(--point) * 5);
   margin: 0 auto;
+}
+
+#start-game:hover {
+  background-color: #ffbfa4;
+  cursor: pointer;
 }
 
 .lost {
@@ -223,49 +236,22 @@ background-image: url('./buttons/mute-off.svg');
 /* media queries */
 
 /* mid-size to small screens */
-@media (width < 950px) {
-  body {
-    font-size: 0.4rem;
-  }
-
-  #stats {
-    height: 1.4rem;
-  }
-
-  #playground {
-    width: calc(100vh - 1.5rem);
-    height: calc(100vh - 1.5rem);
-  }
-
-  .plane {
-    width: calc(100vh - 1.5rem);
-    height: calc(100vh - 1.5rem);
+@media (width < 130vh) {
+  #controls {
+    position: unset;
+    left: unset;
+    margin: unset;
+    margin-top: auto;
+    width: 75vw;
+    height: 75vw;
   }
 }
 
 /* portrait mode */
 @media (orientation: portrait) {
-  main {
-    width: 100vw;
-    align-items: center;
-    margin: 0 auto;
-  }
-
-  #playground {
-    width: 100vw;
-    height: 100vw;
-  }
-
-  .plane {
-    width: 100vw;
-    height: 100vw;
-  }
-
-  #controls {
-    position: unset;
-    left: unset;
-    margin: unset;
-  }
+ :root {
+   --point: 1vw;
+ }
 }
 
 /* ======================================= */
