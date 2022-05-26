@@ -19,10 +19,15 @@ const interface = {
   mute: document.querySelector(`.mute`),
   controls: document.getElementById(`controls`),
   popup: document.getElementById(`popup`),
-  audio: {
+},
+  audio = {
     chomp: document.querySelector(`.chomp`),
-  }
-}
+    intro: document.querySelector(`.intro`),
+    eatGhost: document.querySelector(`.eat-ghost`),
+    intermission: document.querySelector(`.intermission`),
+    death: document.querySelector(`.death`),
+  };
+
 
 // ================================================ \\
 
@@ -47,8 +52,44 @@ const game = {
   refreshCounter: 0,
   wave: 0,
   intervalIds: [],
+  audiTimeoutIds: {},
   isOnMute: false,
 
+  playSound(sound) {
+    switch (sound) {
+      case `chomp`:
+        clearTimeout(this.audiTimeoutIds.chomp);
+
+        this.audiTimeoutIds.chomp = setTimeout(() => {
+          audio.chomp.pause();
+          audio.chomp.currentTime = 0;
+        }, 500);
+
+        audio.chomp.play();
+        return;
+      case `eatGhost`:
+        audio.eatGhost.currentTime = 0;
+        audio.eatGhost.play();
+        return;
+      case `intermission`:
+        clearTimeout(this.audiTimeoutIds.intermission);
+
+        this.audiTimeoutIds.intermission = setTimeout(() => {
+          audio.intermission.pause();
+          audio.intermission.currentTime = 0;
+        }, 7000);
+
+        audio.intermission.play();
+        return;
+      case `death`:
+        audio.death.currentTime = 0;
+        audio.death.play();
+        return;
+      case `intro`:
+        audio.intro.currentTime = 0;
+        audio.intro.play();
+    }
+  },
   refresh() {
     pacman.move();
     ghosts.forEach(ghost => { ghost.move() });
@@ -58,12 +99,14 @@ const game = {
     if (pacmanPreviousCell === 2) {
       this.pillsLeft.pellets--;
       this.updateScore(10);
-      // TODO SOUND
+
+      this.playSound(`chomp`);
     } else if (pacmanPreviousCell === 3) {
       this.pillsLeft.powerUps--;
       this.updateScore(50);
       ghosts.forEach(ghost => { ghost.makeEatable() });
-      // TODO SOUND
+
+      this.playSound(`intermission`);
     }
     if (pacmanPreviousCell < 4 && pacmanPreviousCell > 1) {
       this.matrix[pacman.previousPosition] = 1;
@@ -96,6 +139,7 @@ const game = {
 
   start() {
     this.renderPopup(`hidden`);
+    this.playSound(`intro`);
 
 
     if (this.playgroundIsBuilt) {
@@ -189,7 +233,7 @@ const game = {
     this.end();
     pacman.die();
 
-    setTimeout(() => { this.hideGhosts(); this.renderPacman() }, 1000);
+    setTimeout(() => { this.hideGhosts(); this.renderPacman(); this.playSound(`death`) }, 1000);
     setTimeout(() => { this.renderPopup(`lost`) }, 2700);
   },
 
@@ -290,16 +334,14 @@ const game = {
     const encounters = [];
 
     for (let ghost of ghosts) {
-      if (
-        ghost.position !== pacman.position
-        && ghost.previousPosition !== pacman.position
-        && pacman.previousPosition !== ghost.position
-        || ghost.isEaten
-      ) {
-        continue;
+      const isPacmanCollingWithGhost = ghost.position === pacman.position
+        || (ghost.previousPosition === pacman.position
+          && pacman.previousPosition === ghost.position)
+
+      if (!ghost.isEaten && isPacmanCollingWithGhost) {
+        encounters.push(ghost);
       }
 
-      encounters.push(ghost);
     }
 
     return encounters;

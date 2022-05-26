@@ -9,13 +9,13 @@
 
 @keyframes pacman {
   0% {
-    background-image: url("/resources/sprites/pacman/pacman-1.svg");
+    background-image: url("./resources/sprites/pacman/pacman-1.svg");
   }
   50% {
-    background-image: url("/resources/sprites/pacman/pacman-2.svg");
+    background-image: url("./resources/sprites/pacman/pacman-2.svg");
   }
   100% {
-    background-image: url("/resources/sprites/pacman/pacman-3.svg");
+    background-image: url("./resources/sprites/pacman/pacman-3.svg");
   }
 }
 
@@ -43,37 +43,37 @@
 
 @keyframes d-pacman {
   0% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-1.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-1.svg");
   }
   5% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-2.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-2.svg");
   }
   15% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-3.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-3.svg");
   }
   25% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-4.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-4.svg");
   }
   35% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-5.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-5.svg");
   }
   45% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-6.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-6.svg");
   }
   55% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-7.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-7.svg");
   }
   65% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-8.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-8.svg");
   }
   75% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-9.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-9.svg");
   }
   85% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-10.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-10.svg");
   }
   95% {
-    background-image: url("/resources/sprites/pacman/dying/d-pacman-11.svg");
+    background-image: url("./resources/sprites/pacman/dying/d-pacman-11.svg");
   }
 }
 
@@ -96,10 +96,10 @@
 
 @keyframes blinky-up {
   from {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-up-1.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-up-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-up-2.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-up-2.svg");
   }
 }
 
@@ -110,10 +110,10 @@
 
 @keyframes blinky-down {
   from {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-down-1.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-down-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-down-2.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-down-2.svg");
   }
 }
 
@@ -124,10 +124,10 @@
 
 @keyframes blinky-left {
   from {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-left-1.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-left-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-left-2.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-left-2.svg");
   }
 }
 
@@ -138,10 +138,10 @@
 
 @keyframes blinky-right {
   from {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-right-1.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-right-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/blinky/blinky-right-2.svg");
+    background-image: url("./resources/sprites/ghosts/blinky/blinky-right-2.svg");
   }
 }
 
@@ -155,10 +155,10 @@
 
 @keyframes inky-up {
   from {
-    background-image: url("/resources/sprites/ghosts/inky/inky-up-1.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-up-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/inky/inky-up-2.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-up-2.svg");
   }
 }
 
@@ -169,10 +169,10 @@
 
 @keyframes inky-down {
   from {
-    background-image: url("/resources/sprites/ghosts/inky/inky-down-1.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-down-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/inky/inky-down-2.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-down-2.svg");
   }
 }
 
@@ -183,10 +183,10 @@
 
 @keyframes inky-left {
   from {
-    background-image: url("/resources/sprites/ghosts/inky/inky-left-1.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-left-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/inky/inky-left-2.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-left-2.svg");
   }
 }
 
@@ -197,10 +197,10 @@
 
 @keyframes inky-right {
   from {
-    background-image: url("/resources/sprites/ghosts/inky/inky-right-1.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-right-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/inky/inky-right-2.svg");
+    background-image: url("./resources/sprites/ghosts/inky/inky-right-2.svg");
   }
 }
 
@@ -214,10 +214,10 @@
 
 @keyframes pinky-up {
   from {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-up-1.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-up-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-up-2.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-up-2.svg");
   }
 }
 
@@ -228,10 +228,10 @@
 
 @keyframes pinky-down {
   from {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-down-1.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-down-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-down-2.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-down-2.svg");
   }
 }
 
@@ -242,10 +242,10 @@
 
 @keyframes pinky-left {
   from {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-left-1.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-left-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-left-2.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-left-2.svg");
   }
 }
 
@@ -256,10 +256,10 @@
 
 @keyframes pinky-right {
   from {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-right-1.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-right-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/pinky/pinky-right-2.svg");
+    background-image: url("./resources/sprites/ghosts/pinky/pinky-right-2.svg");
   }
 }
 
@@ -273,10 +273,10 @@
 
 @keyframes clyde-up {
   from {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-up-1.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-up-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-up-2.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-up-2.svg");
   }
 }
 
@@ -287,10 +287,10 @@
 
 @keyframes clyde-down {
   from {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-down-1.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-down-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-down-2.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-down-2.svg");
   }
 }
 
@@ -301,10 +301,10 @@
 
 @keyframes clyde-left {
   from {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-left-1.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-left-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-left-2.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-left-2.svg");
   }
 }
 
@@ -315,10 +315,10 @@
 
 @keyframes clyde-right {
   from {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-right-1.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-right-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/clyde/clyde-right-2.svg");
+    background-image: url("./resources/sprites/ghosts/clyde/clyde-right-2.svg");
   }
 }
 
@@ -330,10 +330,10 @@
 
 @keyframes eatable-ghost {
   from {
-    background-image: url("/resources/sprites/ghosts/eatable-ghost-1.svg");
+    background-image: url("./resources/sprites/ghosts/eatable-ghost-1.svg");
   }
   to {
-    background-image: url("/resources/sprites/ghosts/eatable-ghost-2.svg");
+    background-image: url("./resources/sprites/ghosts/eatable-ghost-2.svg");
   }
 }
 
@@ -342,20 +342,20 @@
 
 /* up */
 .eaten.ghost.up {
-  background-image: url(/resources/sprites/ghosts/eaten-ghost-up.svg);
+  background-image: url(./resources/sprites/ghosts/eaten-ghost-up.svg);
 }
 
 /* down */
 .eaten.ghost.down {
-  background-image: url(/resources/sprites/ghosts/eaten-ghost-down.svg);
+  background-image: url(./resources/sprites/ghosts/eaten-ghost-down.svg);
 }
 
 /* left */
 .eaten.ghost.left {
-  background-image: url(/resources/sprites/ghosts/eaten-ghost-left.svg);
+  background-image: url(./resources/sprites/ghosts/eaten-ghost-left.svg);
 }
 
 /* right */
 .eaten.ghost.right {
-  background-image: url(/resources/sprites/ghosts/eaten-ghost-right.svg);
+  background-image: url(./resources/sprites/ghosts/eaten-ghost-right.svg);
 }
