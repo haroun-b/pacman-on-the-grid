@@ -13,9 +13,7 @@ class Player {
   }
 
   changeDirection(newDir) {
-    if (this.canMove(newDir)) {
-      this.direction = newDir;
-    }
+    this.direction = newDir;
   }
 
   getClasses() {
@@ -65,6 +63,11 @@ class Player {
         break;
     }
   }
+
+  reset() {
+    this.position = this.startPosition;
+    this.previousPosition = -1;
+  }
 }
 // ================================================ \\
 
@@ -85,9 +88,9 @@ class PacMan extends Player {
   }
 
   reset() {
-    this.position = this.startPosition;
     this.direction = `right`;
     this.isDead = false;
+    super.reset();
   }
 }
 // ================================================ \\
@@ -109,10 +112,6 @@ class Ghost extends Player {
 
   isHome() {
     return this.game.matrix[this.position] === 5;
-  }
-
-  reset() {
-    this.position = this.startPosition;
   }
 
   getHuntPosition() {
@@ -271,8 +270,8 @@ class Ghost extends Player {
   }
 }
 class Blinky extends Ghost {
-  constructor({ game, pacman, startPosition = 157, homePosition }) {
-    super({ game, pacman, name: `Blinky`, direction: `left`, classes: `blinky`,startPosition, scatterPosition: (game.width - 1), reward: 200 });
+  constructor({ game, pacman, startPosition = 157, homePosition = 199 }) {
+    super({ game, pacman, name: `Blinky`, direction: `left`, classes: `blinky`, startPosition, scatterPosition: (game.width - 1), reward: 200 });
     this.homePosition = homePosition;
   }
 
@@ -283,7 +282,7 @@ class Blinky extends Ghost {
 
 class Pinky extends Ghost {
   constructor({ game, pacman }) {
-    super({ game, pacman, name: `Pinky`, direction: `up`, classes: `pinky`,startPosition: 199, scatterPosition: 0, reward: 400 });
+    super({ game, pacman, name: `Pinky`, direction: `up`, classes: `pinky`, startPosition: 199, scatterPosition: 0, reward: 400 });
   }
 
   getHuntPosition() {
@@ -302,7 +301,7 @@ class Pinky extends Ghost {
 
 class Inky extends Ghost {
   constructor({ game, pacman, blinky }) {
-    super({ game, pacman, name: `Inky`, direction: `up`, classes: `inky`,startPosition: 198, scatterPosition: game.matrix.length - 1, reward: 800 });
+    super({ game, pacman, name: `Inky`, direction: `up`, classes: `inky`, startPosition: 198, scatterPosition: game.matrix.length - 1, reward: 800 });
     this.blinky = blinky;
   }
 
@@ -340,7 +339,7 @@ class Inky extends Ghost {
 
 class Clyde extends Ghost {
   constructor({ game, pacman }) {
-    super({ game, pacman, name: `Clyde`, direction: `up`, classes: `clyde`,startPosition: 200, scatterPosition: game.matrix.length - game.width, reward: 1600 });
+    super({ game, pacman, name: `Clyde`, direction: `up`, classes: `clyde`, startPosition: 200, scatterPosition: game.matrix.length - game.width, reward: 1600 });
   }
 
   updateTargetPosition() {
