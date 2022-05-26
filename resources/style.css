@@ -44,7 +44,14 @@ main {
   all: unset;
   height: 1.3rem;
   width: 1.3rem;
-  background-color: #fff;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.mute.on {
+background-image: url('./buttons/mute-on.svg');
+}
+.mute.off {
+background-image: url('./buttons/mute-off.svg');
 }
 /* ======================================= */
 

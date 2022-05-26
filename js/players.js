@@ -244,6 +244,9 @@ class Ghost extends Player {
   }
 
   makeEatable() {
+    if (this.isEaten) {
+      return;
+    }
     this.isEatable = true;
     this.targetPosition = this.previousPosition;
 

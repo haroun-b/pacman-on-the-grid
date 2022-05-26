@@ -1,5 +1,6 @@
+// ================================================ \\
 /*
-name:  numberInGame
+name:  inGameNumber
 
 wall: 0,
 emptySpace: 1,
@@ -8,27 +9,22 @@ powerUp: 3,
 ghostHomeEntrance: 4,
 ghostHomeCell: 5,
 */
-
 // ================================================ \\
 
 // ================================================ \\
-// buttons
-
 const interface = {
   startBtn: document.getElementById(`start-game`),
-  mute: document.querySelector(`.mute`),
+  muteBtn: document.querySelector(`.mute`),
   controls: document.getElementById(`controls`),
   popup: document.getElementById(`popup`),
 },
   audio = {
-    chomp: document.querySelector(`.chomp`),
     intro: document.querySelector(`.intro`),
-    eatGhost: document.querySelector(`.eat-ghost`),
+    chomp: document.querySelector(`.chomp`),
     intermission: document.querySelector(`.intermission`),
+    eatGhost: document.querySelector(`.eat-ghost`),
     death: document.querySelector(`.death`),
   };
-
-
 // ================================================ \\
 
 // ================================================ \\
@@ -55,41 +51,46 @@ const game = {
   audiTimeoutIds: {},
   isOnMute: false,
 
-  playSound(sound) {
-    switch (sound) {
-      case `chomp`:
-        clearTimeout(this.audiTimeoutIds.chomp);
+  start() {
+    this.renderPopup(`hidden`);
+    this.playSound(`intro`);
 
-        this.audiTimeoutIds.chomp = setTimeout(() => {
-          audio.chomp.pause();
-          audio.chomp.currentTime = 0;
-        }, 500);
 
-        audio.chomp.play();
-        return;
-      case `eatGhost`:
-        audio.eatGhost.currentTime = 0;
-        audio.eatGhost.play();
-        return;
-      case `intermission`:
-        clearTimeout(this.audiTimeoutIds.intermission);
+    if (this.playgroundIsBuilt) {
+      this.matrix = playground.flat();
 
-        this.audiTimeoutIds.intermission = setTimeout(() => {
-          audio.intermission.pause();
-          audio.intermission.currentTime = 0;
-        }, 7000);
+      this.refreshCounter = 0;
+      this.wave = 0;
+      this.score = 0;
+      pacman.reset();
+      ghosts.forEach(ghost => { ghost.reset() });
 
-        audio.intermission.play();
-        return;
-      case `death`:
-        audio.death.currentTime = 0;
-        audio.death.play();
-        return;
-      case `intro`:
-        audio.intro.currentTime = 0;
-        audio.intro.play();
+      this.playgroundElement.classList.remove(`won`);
+      this.updateScore(0);
+    } else {
+      this.buildCells();
+      this.renderWalls();
+
+      this.playgroundIsBuilt = true;
     }
+
+    this.pillsLeft = this.countPills();
+    this.renderPills();
+    this.renderPacman();
+    this.renderGhosts();
+
+    // setTimeout to allow the intro to play
+    setTimeout(() => {
+      const refreshIntervalId = setInterval(() => { game.refresh() }, 190);
+      // when wave % 5 === 0 scatter
+      const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
+
+      this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
+
+      listenForInput();
+    }, 3000);
   },
+
   refresh() {
     pacman.move();
     ghosts.forEach(ghost => { ghost.move() });
@@ -136,49 +137,123 @@ const game = {
 
     this.refreshCounter > 10 ? this.refreshCounter = 0 : this.refreshCounter++;
   },
+  // returns an array of ghosts
+  detectEncounter() {
+    const encounters = [];
 
-  start() {
-    this.renderPopup(`hidden`);
-    this.playSound(`intro`);
+    for (let ghost of ghosts) {
+      const isPacmanCollingWithGhost = ghost.position === pacman.position
+        || (ghost.previousPosition === pacman.position
+          && pacman.previousPosition === ghost.position)
 
+      if (!ghost.isEaten && isPacmanCollingWithGhost) {
+        encounters.push(ghost);
+      }
 
-    if (this.playgroundIsBuilt) {
-      this.matrix = playground.flat();
-
-      this.refreshCounter = 0;
-      this.wave = 0;
-      this.score = 0;
-      pacman.reset();
-      ghosts.forEach(ghost => { ghost.reset() });
-
-      this.playgroundElement.classList.remove(`won`);
-      this.updateScore(0);
-    } else {
-      this.buildCells();
-      this.renderWalls();
-
-      this.playgroundIsBuilt = true;
     }
 
-    this.pillsLeft = this.countPills();
-    this.renderPills();
-    this.renderPacman();
-    this.renderGhosts();
-
-    // setTimeout to allow the intro to play
-    setTimeout(() => {
-      const refreshIntervalId = setInterval(() => { game.refresh() }, 190);
-      // when wave % 5 === 0 scatter
-      const waveIntervalId = setInterval(() => { this.wave++ }, 5000);
-
-      this.intervalIds = [...[refreshIntervalId, waveIntervalId]];
-
-      listenForInput();
-    }, 3000);
+    return encounters;
   },
 
   end() {
     this.intervalIds.forEach(id => { clearInterval(id) });
+  },
+
+  win() {
+    this.end();
+    this.playgroundElement.classList.add(`won`);
+
+    this.hideGhosts();
+    setTimeout(() => { this.renderPopup(`won`) }, 1000);
+  },
+
+  lose() {
+    this.end();
+    pacman.die();
+
+    setTimeout(() => { this.hideGhosts(); this.renderPacman(); this.playSound(`death`) }, 1000);
+    setTimeout(() => { this.renderPopup(`lost`) }, 2700);
+  },
+
+  buildCells() {
+    this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
+    this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
+
+    for (let i = 0; i < this.matrix.length; i++) {
+      const phCell = document.createElement(`div`);
+      const spCell = document.createElement(`div`);
+
+      phCell.className = `cell`;
+      spCell.className = `cell ghost`;
+
+      // phCell.textContent = i.toString(); // TODO: delete this line
+      // spCell.textContent = i.toString(); // TODO: delete this line
+
+      this.phCells.push(phCell);
+      this.phContainer.appendChild(phCell);
+      this.spCells.push(spCell);
+      this.spContainer.appendChild(spCell);
+    }
+  },
+
+  countPills() {
+    let newPelletCount = 0,
+      newPowerUpCount = 0;
+
+    this.matrix.forEach(cell => {
+      switch (cell) {
+        case 2:
+          newPelletCount++;
+          break;
+        case 3:
+          newPowerUpCount++;
+      }
+    });
+
+    return { pellets: newPelletCount, powerUps: newPowerUpCount };
+  },
+
+  renderPills() {
+    for (let i = 0; i < this.matrix.length; i++) {
+      switch (this.matrix[i]) {
+        case 2:
+          this.phCells[i].className = `cell pellet`;
+          break;
+        case 3:
+          this.phCells[i].className = `cell power-up`;
+      }
+    }
+  },
+
+  renderWalls() {
+    for (let i = 0; i < this.matrix.length; i++) {
+      if (this.matrix[i] === 0) {
+        this.phCells[i].className = `cell wall`;
+      }
+    }
+  },
+
+  renderGhosts() {
+    for (let ghost of ghosts) {
+      if (ghost.previousPosition >= 0) {
+        this.spCells[ghost.previousPosition].className = `cell ghost`;
+      }
+
+      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
+    }
+  },
+
+  hideGhosts() {
+    ghosts.forEach(ghost => {
+      this.spCells[ghost.position].className = `cell ghost`
+    });
+  },
+
+  renderPacman() {
+    if (pacman.previousPosition >= 0) {
+      this.phCells[pacman.previousPosition].className = `cell`;
+    }
+    this.phCells[pacman.position].className = `cell ${pacman.getClasses()}`;
   },
 
   renderPopup(state) {
@@ -221,103 +296,6 @@ const game = {
     interface.popup.style = null;
   },
 
-  win() {
-    this.end();
-    this.playgroundElement.classList.add(`won`);
-
-    this.hideGhosts();
-    setTimeout(() => { this.renderPopup(`won`) }, 1000);
-  },
-
-  lose() {
-    this.end();
-    pacman.die();
-
-    setTimeout(() => { this.hideGhosts(); this.renderPacman(); this.playSound(`death`) }, 1000);
-    setTimeout(() => { this.renderPopup(`lost`) }, 2700);
-  },
-
-  renderPacman() {
-    if (pacman.previousPosition >= 0) {
-      this.phCells[pacman.previousPosition].className = `cell`;
-    }
-    this.phCells[pacman.position].className = `cell ${pacman.getClasses()}`;
-  },
-
-  hideGhosts() {
-    ghosts.forEach(ghost => {
-      this.spCells[ghost.position].className = `cell ghost`
-    });
-  },
-
-  renderGhosts() {
-    for (let ghost of ghosts) {
-      if (ghost.previousPosition >= 0) {
-        this.spCells[ghost.previousPosition].className = `cell ghost`;
-      }
-
-      this.spCells[ghost.position].className = `cell ghost ${ghost.getClasses()}`;
-    }
-  },
-
-  renderPills() {
-    for (let i = 0; i < this.matrix.length; i++) {
-      switch (this.matrix[i]) {
-        case 2:
-          this.phCells[i].className = `cell pellet`;
-          break;
-        case 3:
-          this.phCells[i].className = `cell power-up`;
-      }
-    }
-  },
-
-  renderWalls() {
-    for (let i = 0; i < this.matrix.length; i++) {
-      if (this.matrix[i] === 0) {
-        this.phCells[i].className = `cell wall`;
-      }
-    }
-  },
-
-  buildCells() {
-    this.phContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
-    this.spContainer.style += `grid-template-rows: repeat(${this.height}, 1fr); grid-template-columns: repeat(${this.width}, 1fr);`
-
-    for (let i = 0; i < this.matrix.length; i++) {
-      const phCell = document.createElement(`div`);
-      const spCell = document.createElement(`div`);
-
-      phCell.className = `cell`;
-      spCell.className = `cell ghost`;
-
-      // phCell.textContent = i.toString(); // TODO: delete this line
-      // spCell.textContent = i.toString(); // TODO: delete this line
-
-      this.phCells.push(phCell);
-      this.phContainer.appendChild(phCell);
-      this.spCells.push(spCell);
-      this.spContainer.appendChild(spCell);
-    }
-  },
-
-  countPills() {
-    let newPelletCount = 0,
-      newPowerUpCount = 0;
-
-    this.matrix.forEach(cell => {
-      switch (cell) {
-        case 2:
-          newPelletCount++;
-          break;
-        case 3:
-          newPowerUpCount++;
-      }
-    });
-
-    return { pellets: newPelletCount, powerUps: newPowerUpCount };
-  },
-
   updateScore(points) {
     this.score += points;
 
@@ -329,27 +307,57 @@ const game = {
     }
   },
 
-  // returns an array
-  detectEncounter() {
-    const encounters = [];
-
-    for (let ghost of ghosts) {
-      const isPacmanCollingWithGhost = ghost.position === pacman.position
-        || (ghost.previousPosition === pacman.position
-          && pacman.previousPosition === ghost.position)
-
-      if (!ghost.isEaten && isPacmanCollingWithGhost) {
-        encounters.push(ghost);
-      }
-
+  playSound(sound) {
+    if (this.isOnMute) {
+      return;
     }
 
-    return encounters;
+    switch (sound) {
+      case `chomp`:
+        clearTimeout(this.audiTimeoutIds.chomp);
+
+        this.audiTimeoutIds.chomp = setTimeout(() => {
+          audio.chomp.pause();
+          audio.chomp.currentTime = 0;
+        }, 500);
+
+        audio.chomp.play();
+        return;
+      case `eatGhost`:
+        audio.eatGhost.currentTime = 0;
+        audio.eatGhost.play();
+        return;
+      case `intermission`:
+        clearTimeout(this.audiTimeoutIds.intermission);
+
+        this.audiTimeoutIds.intermission = setTimeout(() => {
+          audio.intermission.pause();
+          audio.intermission.currentTime = 0;
+        }, 7000);
+
+        audio.intermission.play();
+        return;
+      case `death`:
+        audio.death.currentTime = 0;
+        audio.death.play();
+        return;
+      case `intro`:
+        audio.intro.currentTime = 0;
+        audio.intro.play();
+    }
+  },
+
+  toggleSound() {
+    if (this.isOnMute) {
+      this.isOnMute = false;
+      interface.muteBtn.className = `mute off`;
+      return;
+    }
+    
+    this.isOnMute = true;
+    interface.muteBtn.className = `mute on`;
   }
 }
-
-
-
 // ================================================ \\
 
 const pacman = new PacMan({ game });
@@ -378,9 +386,11 @@ document.addEventListener(`keydown`, e => {
 
 // ================================================ \\
 // starts the game \\
-interface.startBtn.addEventListener(`click`, e => {
-  game.start();
-});
+interface.startBtn.addEventListener(`click`, e => { game.start() });
+
+// ================================================ \\
+// mute button \\
+interface.muteBtn.addEventListener(`click`, e => { game.toggleSound() });
 
 // ================================================ \\
 
@@ -425,19 +435,3 @@ function listenForInput() {
 }
 
 // ================================================ \\
-
-// ================================================ \\
-// testing zone \\
-
-// game.buildCells();
-// game.renderWalls();
-// game.renderPills();
-
-// game.start();
-
-document.addEventListener(`keydown`, e => {
-  switch (e.code) {
-    case `KeyH`:
-      game.end();
-  }
-});
