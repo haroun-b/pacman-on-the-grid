@@ -85,6 +85,7 @@ const game = {
       for (let ghost of encounters) {
         if (ghost.isEatable) {
           ghost.getEaten();
+          this.updateScore(ghost.reward);
         } else {
           this.lose(ghost);
           this.renderPlayground();

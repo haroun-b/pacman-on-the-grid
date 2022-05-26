@@ -66,7 +66,6 @@ class Player {
     }
   }
 }
-
 // ================================================ \\
 
 // ================================================ \\
@@ -91,8 +90,6 @@ class PacMan extends Player {
     this.isDead = false;
   }
 }
-
-
 // ================================================ \\
 
 // ================================================ \\
@@ -100,6 +97,7 @@ class PacMan extends Player {
 class Ghost extends Player {
   constructor({ game, pacman, name, direction, classes, startPosition, scatterPosition, reward }) {
     super({ game, name, direction, classes, startPosition });
+    this.homePosition = startPosition;
     this.scatterPosition = scatterPosition;
     this.targetPosition = scatterPosition;
     this.eatableTimeoutId = -1;
@@ -132,8 +130,6 @@ class Ghost extends Player {
 
   canMove(direction = this.direction) {
     // eaten ghosts can move through walls
-    // !problem might be here
-
     return this.isEaten ? true : super.canMove(direction);
   }
 
@@ -157,16 +153,17 @@ class Ghost extends Player {
     }
   }
 
-  getTargetPosition() {
+  updateTargetPosition() {
     if (this.isHome()) {
       if (this.isEaten) {
         this.isEaten = false;
       }
 
-      this.targetPosition = this.homeEntrance;
+      this.targetPosition = this.ghostHomeEntrance;
       return;
     }
-    // *when a ghost is eatable it picks a random empty cell to move towards
+
+    // when a ghost is eatable it picks a random empty cell to move towards
     if (this.isEatable) {
       const notWalls =
         this.game.matrix
@@ -177,13 +174,14 @@ class Ghost extends Player {
       this.targetPosition = randomTargetPosition;
       return;
     }
-    // *when eaten the ghost goes home
+
+    // when eaten the ghost goes home
     if (this.isEaten) {
-      this.targetPosition = this.startPosition;
+      this.targetPosition = this.homePosition;
       return;
     }
 
-    // *every fifth wave the ghosts scatter
+    // every fifth wave the ghosts scatter
     if (this.game.wave % 5 === 0) {
       this.targetPosition = this.scatterPosition;
       return;
@@ -195,14 +193,12 @@ class Ghost extends Player {
   changeDirection() {
     let clearPaths = this.getClearPaths();
 
-    // *direction is only changed at intersections. ie 3 or more clearPaths
+    // direction is only changed at intersections. ie 3 or more clearPaths
     if (clearPaths.length < 3 && this.canMove()) {
       return;
     }
-    console.log(clearPaths, this.canMove(), this.getTargetPosition(), this);
 
-    // *so targetPosition can be changed to previous position when there's a state change
-    this.getTargetPosition();
+    this.updateTargetPosition();
 
     const targetIsPrevious = this.previousPosition === this.targetPosition,
       pathToPrevious = this.getPathToPrevious();
@@ -219,9 +215,6 @@ class Ghost extends Player {
       absYDistance = Math.abs(yDistance),
       absXDistance = Math.abs(xDistance);
 
-    // console.log(clearPaths);  // TODO: remove this line
-
-    // ! fix this
     this.direction = clearPaths.find((path, index) => {
       if (index === clearPaths.length - 1) {
         return true;
@@ -248,14 +241,14 @@ class Ghost extends Player {
     this.isEatable = false;
     this.isEaten = true;
 
-    this.targetPosition = this.startPosition;
-    this.game.updateScore(this.reward);
+    this.updateTargetPosition()
   }
 
   makeEatable() {
     this.isEatable = true;
     this.targetPosition = this.previousPosition;
 
+    // to avoid prematurely making uneatable by a previously consumed powerUp
     if (this.eatableTimeoutId > 0) {
       clearTimeout(this.eatableTimeoutId);
     }
@@ -277,21 +270,20 @@ class Ghost extends Player {
     }
   }
 }
-
 class Blinky extends Ghost {
-  constructor({ game, position = 157, pacman }) {
-    super({ game, name: `Blinky`, direction: `left`, classes: `blinky`,startPosition: 199, scatterPosition: (game.width - 1), position, reward: 200, pacman });
-    this.initialPosition = position;
+  constructor({ game, pacman, startPosition = 157, homePosition }) {
+    super({ game, pacman, name: `Blinky`, direction: `left`, classes: `blinky`,startPosition, scatterPosition: (game.width - 1), reward: 200 });
+    this.homePosition = homePosition;
   }
 
   reset() {
-    this.position = this.initialPosition;
+    this.position = this.startPosition;
   }
 }
 
 class Pinky extends Ghost {
   constructor({ game, pacman }) {
-    super({ game, name: `Pinky`, direction: `up`, classes: `pinky`,startPosition: 199, scatterPosition: 0, reward: 400, pacman });
+    super({ game, pacman, name: `Pinky`, direction: `up`, classes: `pinky`,startPosition: 199, scatterPosition: 0, reward: 400 });
   }
 
   getHuntPosition() {
@@ -310,7 +302,7 @@ class Pinky extends Ghost {
 
 class Inky extends Ghost {
   constructor({ game, pacman, blinky }) {
-    super({ game, name: `Inky`, direction: `up`, classes: `inky`,startPosition: 198, scatterPosition: game.matrix.length - 1, reward: 800, pacman });
+    super({ game, pacman, name: `Inky`, direction: `up`, classes: `inky`,startPosition: 198, scatterPosition: game.matrix.length - 1, reward: 800 });
     this.blinky = blinky;
   }
 
@@ -329,7 +321,6 @@ class Inky extends Ghost {
         break;
       case `right`:
         twoAheadOfPacman = (this.pacman.position + 1) % this.game.width === 0 ? this.pacman.position - (this.game.width - 2) : (this.pacman.position - 2);
-        break;
     }
 
     const yDistance = Math.floor(this.blinky.position / this.game.width) - Math.floor(twoAheadOfPacman / this.game.width),
@@ -337,6 +328,7 @@ class Inky extends Ghost {
 
     return this.blinky.position - (this.game.width * yDistance * 2) - (xDistance * 2);
   }
+
   move() {
     if (this.isHome() && this.game.score < 300) {
       return;
@@ -348,13 +340,13 @@ class Inky extends Ghost {
 
 class Clyde extends Ghost {
   constructor({ game, pacman }) {
-    super({ game, name: `Clyde`, direction: `up`, classes: `clyde`,startPosition: 200, scatterPosition: game.matrix.length - game.width, reward: 1600, pacman });
+    super({ game, pacman, name: `Clyde`, direction: `up`, classes: `clyde`,startPosition: 200, scatterPosition: game.matrix.length - game.width, reward: 1600 });
   }
 
-  getTargetPosition() {
+  updateTargetPosition() {
     const absYDistance = Math.abs(Math.floor(this.position / this.game.width) - Math.floor(this.pacman.position / this.game.width)),
       absXDistance = Math.abs(this.position % this.game.width - this.pacman.position % this.game.width),
-      targetPosition = super.getTargetPosition();
+      targetPosition = super.updateTargetPosition();
 
     if (absXDistance <= 8 || absYDistance <= 8) {
       if (targetPosition === this.pacman.position) {
@@ -364,6 +356,7 @@ class Clyde extends Ghost {
 
     return targetPosition;
   }
+
   move() {
     if (this.isHome() && this.game.score < 800) {
       return;
@@ -372,3 +365,4 @@ class Clyde extends Ghost {
     super.move();
   }
 }
+// ================================================ \\
