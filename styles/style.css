@@ -84,12 +84,12 @@ main {
 
 /* pellet */
 .pellet {
-  background-image: url("/resources/sprites/pellet.svg");
+  background-image: url("./resources/sprites/pellet.svg");
 }
 
 /* power-up */
 .power-up {
-  background-image: url("/resources/sprites/power-up.svg");
+  background-image: url("./resources/sprites/power-up.svg");
   animation: power-up 1s linear infinite alternate;
 }
 
@@ -139,7 +139,7 @@ main {
   grid-area: u;
   top: 22%;
   clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
-  background-image: url("/resources/buttons/up.svg");
+  background-image: url("./resources/buttons/up.svg");
   background-position: 50% 25%;
 }
 
@@ -147,7 +147,7 @@ main {
   grid-area: l;
   left: 22%;
   clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
-  background-image: url("/resources/buttons/left.svg");
+  background-image: url("./resources/buttons/left.svg");
   background-position: 40% 50%;
 }
 
@@ -155,7 +155,7 @@ main {
   grid-area: r;
   right: 22%;
   clip-path: polygon(0 50%, 25% 0, 100% 0, 100% 100%, 25% 100%);
-  background-image: url("/resources/buttons/right.svg");
+  background-image: url("./resources/buttons/right.svg");
   background-position: 60% 50%;
 }
 
@@ -163,7 +163,7 @@ main {
   grid-area: d;
   bottom: 22%;
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 0 100%);
-  background-image: url("/resources/buttons/down.svg");
+  background-image: url("./resources/buttons/down.svg");
   background-position: 50% 75%;
 }
 /* ======================================= */
