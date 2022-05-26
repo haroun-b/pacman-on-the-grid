@@ -1,4 +1,4 @@
-# Pac-Man On The Grid
+# Pac-Man On The Grid (Playable-ish on mobile)
 
 A CSS grid implementation of the famous Pac-Man arcade game. Build using: HTML; CSS; And JavaScript, as Project no 1 of the IronHack WebDev Bootcamp.
 
