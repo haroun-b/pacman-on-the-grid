@@ -205,6 +205,7 @@ background-image: url('./buttons/mute-off.svg');
 
 #popup h2 {
   font-size: calc(var(--point) * 5);
+  color: #ffbfa4;
 }
 
 [alt='instructions gif'] {
