@@ -415,5 +415,14 @@ function listenForInput() {
         pacman.changeDirection(`right`);
     }
   });
+
+  // styles the on-screen controls on tap
+  interface.controls.addEventListener(`touchstart`, e => {
+    e.target.style.backgroundColor = `#1e1e87`;
+  });
+
+  interface.controls.addEventListener(`touchend`, e => {
+    e.target.style.backgroundColor = null;
+  });
 }
 // ================================================ \\

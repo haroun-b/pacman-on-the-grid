@@ -151,7 +151,6 @@ background-image: url('./buttons/mute-off.svg');
 }
 
 .control:hover {
-  background-color: #1e1e87;
   cursor: pointer;
 }
 
