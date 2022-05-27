@@ -28,7 +28,6 @@ main {
   margin: 0 auto;
 }
 /* ======================================= */
-
 /* ======================================= */
 /* stats */
 
@@ -40,30 +39,33 @@ main {
   height: calc(var(--point) * 5.5);
   width: 94%;
 }
-
+/* ======================================= */
+/* ======================================= */
 /* mute button */
 
 .mute {
   all: unset;
   height: calc(var(--point) * 4);
   width: calc(var(--point) * 4);
-  background-repeat: no-repeat;
-  background-size: 100%;
 }
+
 .mute.on {
 background-image: url('./buttons/mute-on.svg');
 }
+
 .mute.off {
 background-image: url('./buttons/mute-off.svg');
 }
-/* ======================================= */
 
+.mute, .cell {
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+/* ======================================= */
 /* ======================================= */
 /* playground */
 
 #playground {
-  width: calc(var(--point) * 94.5);
-  height: calc(var(--point) * 94.5);
   transition: background-color .4s linear .2s ;
 }
 
@@ -71,18 +73,15 @@ background-image: url('./buttons/mute-off.svg');
   background-color: #fff;
 }
 
+#playground, .plane {
+  width: calc(var(--point) * 94.5);
+  height: calc(var(--point) * 94.5);
+}
+
 .plane {
   position: absolute;
   display: grid;
-  width: calc(var(--point) * 94.5);
-  height: calc(var(--point) * 94.5);
   gap: 0;
-}
-
-/* cell */
-.cell {
-  background-repeat: no-repeat;
-  background-size: 100%;
 }
 
 /* walls */
@@ -90,7 +89,7 @@ background-image: url('./buttons/mute-off.svg');
   background-color: #1c1c78;
 }
 
-/* pellet */
+/* pellets */
 .pellet {
   background-image: url("./sprites/pellet.svg");
 }
@@ -110,25 +109,24 @@ background-image: url('./buttons/mute-off.svg');
   }
 }
 /* ======================================= */
-
 /* ======================================= */
 /* controls */
 
 #controls {
-  flex-shrink: 1;
+  position: absolute;
+  left: 0;
+  margin: auto 0;
   display: grid;
   width: calc(var(--point) * 35);
   height: calc(var(--point) * 35);
   grid-template-rows: 1fr 0.75fr 1fr;
   grid-template-columns: 1fr 0.75fr 1fr;
   grid-template-areas:
-    ". u ."
-    "l . r"
-    ". d .";
+  ". u ."
+  "l . r"
+  ". d .";
+  flex-shrink: 1;
   gap: 0;
-  position: absolute;
-  left: 0;
-  margin: auto 0;
 }
 
 .control {
@@ -180,47 +178,52 @@ background-image: url('./buttons/mute-off.svg');
   background-position: 50% 75%;
 }
 /* ======================================= */
-
 /* ======================================= */
 /* popup menu */
 
+#start-game {
+  all: unset;
+}
+
 #popup {
-  position: fixed;
   z-index: 1;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
-  background-color: #000000c1;
-  color: rgb(255, 255, 255);
+  justify-content: space-around;
+  align-items: center;
   text-align: center;
+  background-color: #000000c1;
+  color: #fff;
   font-size: calc(var(--point) * 1.7);
-  padding: calc(var(--point) * 3) calc(var(--point) * 5);
+}
+
+#popup, #start-game {
+  padding: calc(var(--point) * 3) calc(var(--point) * 6);
+}
+
+#start-game {
+  z-index: 2;
+  width: fit-content;
+  background-color: #1c1c78;
+}
+
+#start-game, h2 {
+  font-size: calc(var(--point) * 5);
 }
 
 h2 {
-  font-size: calc(var(--point) * 5);
   color: #ffbfa4;
 }
 
 [alt='instructions gif'] {
-  flex-grow: 1;
   height: 50%;
-  margin: calc(var(--point) * 2) auto;
-}
-
-#start-game {
-  all: unset;
-  font-size: calc(var(--point) * 5);
-  background-color: #1c1c78;
-  color: #fff;
-  width: fit-content;
-  padding: calc(var(--point) * 3) calc(var(--point) * 5);
-  margin: 0 auto;
-  margin-top: 1rem;
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 #start-game:hover {
@@ -235,27 +238,23 @@ h2 {
 .won {
   color: green;
 }
-
+/* ======================================= */
 /* ======================================= */
 /* media queries */
 
-/* mid-size to small screens */
-@media (width < 130vh) {
-  #controls {
-    position: unset;
+@media (orientation: portrait) {
+ :root {
+   --point: 1vw;
+ }
+
+ #controls {
+    position: static;
     left: unset;
     margin: unset;
     margin-top: auto;
     width: 75vw;
     height: 75vw;
   }
-}
-
-/* portrait mode */
-@media (orientation: portrait) {
- :root {
-   --point: 1vw;
- }
 }
 
 /* ======================================= */

@@ -394,7 +394,6 @@ function listenForInput() {
         break;
       case `ArrowRight`:
         pacman.changeDirection(`right`);
-        break;
     }
   });
 
@@ -414,7 +413,6 @@ function listenForInput() {
         break;
       case `control right`:
         pacman.changeDirection(`right`);
-        break;
     }
   });
 }
