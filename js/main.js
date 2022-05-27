@@ -142,6 +142,7 @@ const game = {
   detectEncounter() {
    return ghosts.filter(ghost => {
       const isThereCollision = ghost.position === pacman.position
+      // this is because when they collide head to head they swap positions
       || (ghost.previousPosition === pacman.position
           && pacman.previousPosition === ghost.position);
 
@@ -155,7 +156,7 @@ const game = {
 
   win() {
     this.end();
-    this.playgroundElement.classList.add(`won`);
+    this.playgroundElement.classList.add(`won`);  // this causes the background-color to change to white
 
     this.hideGhosts();
     setTimeout(() => { this.renderPopup(`won`); this.phCells[pacman.position].className = `cell`; }, 1000);
@@ -355,6 +356,7 @@ const pacman = new PacMan({ game });
 
 const blinky = new Blinky({ game, pacman }),
   pinky = new Pinky({ game, pacman }),
+  // blinky is passed to inky because inky relies on blinky's position to choose a hunt target position
   inky = new Inky({ game, pacman, blinky }),
   clyde = new Clyde({ game, pacman }),
   ghosts = [blinky, pinky, inky, clyde];
@@ -366,27 +368,19 @@ const blinky = new Blinky({ game, pacman }),
 
 // hides the on screen controls \\
 document.addEventListener(`keydown`, e => {
-  const main = document.querySelector(`main`),
     controls = document.getElementById(`controls`);
-
-  main.style.justifyContent = `flex-start`;
-  main.style.margin = `0 auto`;
-
   controls.style.display = `none`;
 }, { once: true });
-
 // ================================================ \\
 // starts the game \\
 interface.startBtn.addEventListener(`click`, e => { game.start() });
-
 // ================================================ \\
 // mute button \\
 interface.muteBtn.addEventListener(`click`, e => { game.toggleSound() });
-
 // ================================================ \\
 
 function listenForInput() {
-  // changes pacman's direction based on keyboard input \\
+  // changes pacman's direction based on keyboard input
   document.addEventListener(`keydown`, e => {
     switch (e.code) {
       case `ArrowUp`:
@@ -404,7 +398,7 @@ function listenForInput() {
     }
   });
 
-  // changes pacman's direction based on screen control input \\
+  // changes pacman's direction based on screen control input
   interface.controls.addEventListener(`click`, e => {
     const targetClass = e.target.className;
 
@@ -424,5 +418,4 @@ function listenForInput() {
     }
   });
 }
-
 // ================================================ \\
