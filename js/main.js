@@ -179,9 +179,6 @@ const game = {
       phCell.className = `cell`;
       spCell.className = `cell ghost`;
 
-      // phCell.textContent = i.toString(); // TODO: delete this line
-      // spCell.textContent = i.toString(); // TODO: delete this line
-
       this.phCells.push(phCell);
       this.phContainer.appendChild(phCell);
       this.spCells.push(spCell);
