@@ -1,5 +1,5 @@
 // ================================================ \\
-// player \\
+// character \\
 class Character {
   constructor({ game, name, direction, classes, startPosition }) {
     this.game = game;
@@ -8,7 +8,7 @@ class Character {
     this.classes = classes;
     this.startPosition = startPosition;
     this.position = startPosition;
-    this.previousPosition = -1;
+    this.previousPosition = -1; // previousPosition is initialised outside of the matrix
     this.ghostHomeEntrance = game.matrix.indexOf(4);
   }
 
@@ -114,8 +114,19 @@ class Ghost extends Character {
     return this.game.matrix[this.position] === 5;
   }
 
-  getHuntPosition() {
-    return this.pacman.position;
+  getClasses() {
+    if (this.isEatable) {
+      return `eatable`;
+    } else if (this.isEaten) {
+      return `eaten ${this.direction}`;
+    } else {
+      return super.getClasses();
+    }
+  }
+
+  canMove(direction = this.direction) {
+    // eaten ghosts can move through walls
+    return this.isEaten ? true : super.canMove(direction);
   }
 
   move() {
@@ -125,11 +136,6 @@ class Ghost extends Character {
 
     this.changeDirection();
     super.move();
-  }
-
-  canMove(direction = this.direction) {
-    // eaten ghosts can move through walls
-    return this.isEaten ? true : super.canMove(direction);
   }
 
   getPathToPrevious() {
@@ -189,6 +195,14 @@ class Ghost extends Character {
     this.targetPosition = this.getHuntPosition();
   }
 
+  getHuntPosition() {
+    return this.pacman.position;
+  }
+
+  getClearPaths() {
+    return [`up`, `down`, `left`, `right`].filter(path => this.canMove(path));
+  }
+
   changeDirection() {
     let clearPaths = this.getClearPaths();
 
@@ -232,17 +246,6 @@ class Ghost extends Character {
     });
   }
 
-  getClearPaths() {
-    return [`up`, `down`, `left`, `right`].filter(path => this.canMove(path));
-  }
-
-  getEaten() {
-    this.isEatable = false;
-    this.isEaten = true;
-
-    this.updateTargetPosition()
-  }
-
   makeEatable() {
     if (this.isEaten) {
       return;
@@ -262,14 +265,11 @@ class Ghost extends Character {
     }, 7000);
   }
 
-  getClasses() {
-    if (this.isEatable) {
-      return `eatable`;
-    } else if (this.isEaten) {
-      return `eaten ${this.direction}`;
-    } else {
-      return super.getClasses();
-    }
+  getEaten() {
+    this.isEatable = false;
+    this.isEaten = true;
+
+    this.updateTargetPosition()
   }
 }
 class Blinky extends Ghost {
