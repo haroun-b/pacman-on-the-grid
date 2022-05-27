@@ -210,7 +210,7 @@ h2 {
 
 [alt='instructions gif'] {
   flex-grow: 1;
-  height: 80%;
+  height: 50%;
   margin: calc(var(--point) * 2) auto;
 }
 
@@ -222,6 +222,7 @@ h2 {
   width: fit-content;
   padding: calc(var(--point) * 3) calc(var(--point) * 5);
   margin: 0 auto;
+  margin-top: 1rem;
 }
 
 #start-game:hover {
