@@ -6,6 +6,10 @@
   --point: 1vh;
 }
 
+h1 {
+  display: none;
+}
+
 body {
   background-color: #000;
   color: #fff;
@@ -28,8 +32,14 @@ main {
   margin: 0 auto;
 }
 
-h1 {
-  display: none;
+footer {
+  font-size: calc(var(--point) * 1.2);
+  margin: auto 0;
+}
+
+footer a {
+  text-decoration: dashed;
+  color: #ffbfa4;
 }
 /* ======================================= */
 /* ======================================= */
@@ -78,8 +88,8 @@ background-image: url('./buttons/mute-off.svg');
 }
 
 #playground, .plane {
-  width: calc(var(--point) * 94.5);
-  height: calc(var(--point) * 94.5);
+  width: calc(var(--point) * 91.5);
+  height: calc(var(--point) * 91.5);
 }
 
 .plane {
