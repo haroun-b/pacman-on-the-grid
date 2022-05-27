@@ -19,3 +19,10 @@ This implementation uses the following:
 - Add fruits as consumables.
 - Add more levels.
 - Turn it into a PWA.
+
+## Credit
+[Sound Effects: Classicgaming.cc](https://www.classicgaming.cc/classics/pac-man/sounds)
+
+[Sprites: Spriters-Resource.com](https://www.spriters-resource.com/arcade/pacman/sheet/52631/)
+
+[Article: Understanding Pac-Man Ghost Behavior - By Chad Birch](https://gameinternals.com/understanding-pac-man-ghost-behavior)
