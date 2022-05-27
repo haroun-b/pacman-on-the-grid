@@ -157,7 +157,7 @@ const game = {
     this.playgroundElement.classList.add(`won`);
 
     this.hideGhosts();
-    setTimeout(() => { this.renderPopup(`won`) }, 1000);
+    setTimeout(() => { this.renderPopup(`won`); this.phCells[pacman.position].className = `cell`; }, 1000);
   },
 
   lose() {
