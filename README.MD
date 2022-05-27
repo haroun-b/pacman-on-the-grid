@@ -6,7 +6,7 @@ A CSS grid implementation of the famous Pac-Man arcade game. Build using: HTML; 
 This implementation uses the following:
 
 - A JS Array as a matrix to generate; render and keep track of the playground's state.
-- An Interval to refresh and update the players logic;
+- An Interval to refresh and update the players logic.
 - Two overlayed grids. One to display the ghosts; And another for everything else.
 - CSS animations and class names to display the appropriate sprites.
 
@@ -18,3 +18,4 @@ This implementation uses the following:
 - Add the ability to store the high score in localStorage.
 - Add fruits as consumables.
 - Add more levels.
+- Turn it into a PWA.
