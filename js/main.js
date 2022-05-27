@@ -418,6 +418,9 @@ function listenForInput() {
 
   // styles the on-screen controls on tap
   interface.controls.addEventListener(`touchstart`, e => {
+    if (e.target.id === `controls`) {
+      return;
+    }
     e.target.style.backgroundColor = `#1e1e87`;
   });
 
