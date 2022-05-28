@@ -48,7 +48,7 @@ const game = {
   refreshCounter: 0,
   wave: 0,
   intervalIds: [],
-  audiTimeoutIds: {},
+  audioTimeoutIds: {},
   isOnMute: false,
 
   start() {
@@ -306,9 +306,9 @@ const game = {
 
     switch (sound) {
       case `chomp`:
-        clearTimeout(this.audiTimeoutIds.chomp);
+        clearTimeout(this.audioTimeoutIds.chomp);
 
-        this.audiTimeoutIds.chomp = setTimeout(() => {
+        this.audioTimeoutIds.chomp = setTimeout(() => {
           audio.chomp.pause();
           audio.chomp.currentTime = 0;
         }, 500);
@@ -320,9 +320,9 @@ const game = {
         audio.eatGhost.play();
         return;
       case `intermission`:
-        clearTimeout(this.audiTimeoutIds.intermission);
+        clearTimeout(this.audioTimeoutIds.intermission);
 
-        this.audiTimeoutIds.intermission = setTimeout(() => {
+        this.audioTimeoutIds.intermission = setTimeout(() => {
           audio.intermission.pause();
           audio.intermission.currentTime = 0;
         }, 7000);
